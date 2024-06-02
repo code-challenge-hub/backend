@@ -12,29 +12,34 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 public class User extends AuditingEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "user_id")
-    private String id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "user_id")
+	private String id;
 
-    @Column(name = "nickname")
-    private String nickname;
+	@Column(name = "nickname")
+	private String nickname;
 
-    @Column(name = "email")
-    private String email;
+	@Column(name = "email")
+	private String email;
 
-    @Column(name = "password")
-    private String password;
+	@Column(name = "password")
+	private String password;
 
-    @Builder
-    public User(String nickname, String email, String password) {
-        this.nickname = nickname;
-        this.email = email;
-        this.password = password;
-    }
+	@OneToOne(mappedBy = "user"
+		, cascade = CascadeType.ALL
+		, orphanRemoval = true)
+	private Profile profile;
 
-    public void changePassword(String password) {
-        this.password = password;
-    }
+	@Builder
+	public User(String nickname, String email, String password) {
+		this.nickname = nickname;
+		this.email = email;
+		this.password = password;
+	}
+
+	public void changePassword(String password) {
+		this.password = password;
+	}
 
 }
