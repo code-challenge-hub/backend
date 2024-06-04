@@ -10,7 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,6 +36,5 @@ public class TechStack extends AuditingEntity {
 	private String stackName;
 
 	@Column(name = "icon")
-	@Lob
-	private byte[] icon;
+	private String icon;
 }
