@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.springdoc.config;
+package com.cch.codechallengehub.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -12,7 +12,6 @@ import java.util.List;
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
-
         return new OpenAPI()
                 .info(apiInfo())
                 .servers(apiServers());
