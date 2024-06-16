@@ -7,3 +7,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+
+secret-key: 65c6738864771e5aae992e58a9366f4e86acee5120c9c165fb03af0d29363974164bb6f3fd90d556af4f76657401bd02d612c277d734d4a3b93779a774ca7910
+expiration: 3600000
