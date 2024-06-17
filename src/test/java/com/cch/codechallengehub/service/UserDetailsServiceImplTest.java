@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @DataJpaTest
 class UserDetailsServiceImplTest {
 
@@ -33,10 +35,13 @@ class UserDetailsServiceImplTest {
 			.build();
 		userRepository.save(user);
 		String email = user.getEmail();
+		String password = user.getPassword();
 		// when
 		UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 		// then
 		assertThat(email).isEqualTo(userDetails.getUsername());
+		assertThat(password).isEqualTo(userDetails.getPassword());
+
 	}
 
 }
