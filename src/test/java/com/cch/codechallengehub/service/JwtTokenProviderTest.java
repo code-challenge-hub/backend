@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.config;
+package com.cch.codechallengehub.service;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;

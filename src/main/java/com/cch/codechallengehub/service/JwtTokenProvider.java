@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.config;
+package com.cch.codechallengehub.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -54,7 +54,7 @@ public class JwtTokenProvider {
 				.parseSignedClaims(token);
 			return true;
 		} catch (ExpiredJwtException eje) {
-			log.warn("token expire " + eje.getMessage());
+			throw eje;
 		} catch (Exception e) {
 			log.error(token + " " + e.getMessage());
 		}
