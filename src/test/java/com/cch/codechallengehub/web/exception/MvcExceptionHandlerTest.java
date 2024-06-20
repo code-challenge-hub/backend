@@ -1,8 +1,7 @@
-package com.cch.codechallengehub.api.exception;
+package com.cch.codechallengehub.web.exception;
 
-import static com.cch.codechallengehub.api.exception.ErrorCode.NOT_VALID_PARAM;
-import static com.cch.codechallengehub.api.exception.ErrorCode.NO_FOUND_RESOURCE;
-import static com.cch.codechallengehub.api.exception.ErrorCode.UNKNOWN_ERROR;
+import static com.cch.codechallengehub.web.exception.ErrorCode.NOT_VALID_PARAM;
+import static com.cch.codechallengehub.web.exception.ErrorCode.NO_FOUND_RESOURCE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -23,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @WebMvcTest(TestController.class)
-class GlobalExceptionHandlerTest {
+class MvcExceptionHandlerTest {
 
 	@Autowired
 	WebApplicationContext context;
@@ -39,40 +38,6 @@ class GlobalExceptionHandlerTest {
 			.webAppContextSetup(context)
 			.addFilters(new CharacterEncodingFilter("UTF-8", true))
 			.build();
-	}
-
-	@Test
-	@DisplayName("Exception Test")
-	void exception_test() throws Exception {
-	    // given
-		MockHttpServletRequestBuilder builder = get("/exception");
-		// when
-		ResultActions perform = mockMvc.perform(builder);
-		// then
-		ErrorResponse<ErrorCode> errorResponse = ErrorResponse.<ErrorCode>builder()
-			.errorCode(UNKNOWN_ERROR)
-			.msg("Exception!")
-			.build();
-		String expectBody = objectMapper.writeValueAsString(errorResponse);
-		perform.andExpect(status().isInternalServerError())
-			.andExpect(content().string(expectBody));
-	}
-
-	@Test
-	@DisplayName("Runtime Exception Test")
-	void runtime_exception_test() throws Exception {
-		// given
-		MockHttpServletRequestBuilder builder = get("/runtime-exception");
-		// when
-		ResultActions perform = mockMvc.perform(builder);
-		// then
-		ErrorResponse<ErrorCode> errorResponse = ErrorResponse.<ErrorCode>builder()
-			.errorCode(UNKNOWN_ERROR)
-			.msg("RuntimeException!")
-			.build();
-		String expectBody = objectMapper.writeValueAsString(errorResponse);
-		perform.andExpect(status().isInternalServerError())
-			.andExpect(content().string(expectBody));
 	}
 
 	@Test
@@ -136,10 +101,10 @@ class GlobalExceptionHandlerTest {
 	void handler_method_validation_exception() throws Exception {
 		// given
 		MockHttpServletRequestBuilder builder = get("/handler-method-validation-exception")
-				.param("num", "0");
+			.param("num", "0");
 		// when
 		ResultActions perform = mockMvc.perform(builder);
-	    // then
+		// then
 		ErrorResponse<ErrorCode> errorResponse = ErrorResponse.<ErrorCode>builder()
 			.errorCode(NOT_VALID_PARAM)
 			.msg("must be greater than or equal to 1")

@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.api.exception;
+package com.cch.codechallengehub.web.exception;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;

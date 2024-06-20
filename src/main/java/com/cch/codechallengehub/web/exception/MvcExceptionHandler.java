@@ -1,12 +1,10 @@
-package com.cch.codechallengehub.api.exception;
-
-import static com.cch.codechallengehub.api.exception.ErrorCode.NOT_VALID_PARAM;
-import static com.cch.codechallengehub.api.exception.ErrorCode.NO_FOUND_RESOURCE;
+package com.cch.codechallengehub.web.exception;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -16,12 +14,15 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-public abstract class MvcExceptionHandler extends ResponseEntityExceptionHandler {
+@RestControllerAdvice
+@Order(1)
+public class MvcExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(
@@ -89,7 +90,7 @@ public abstract class MvcExceptionHandler extends ResponseEntityExceptionHandler
 
 	private static ErrorResponse<ErrorCode> getBadRequestErrorResponse(String errorMessage) {
 		return ErrorResponse.<ErrorCode>builder()
-			.errorCode(NOT_VALID_PARAM)
+			.errorCode(ErrorCode.NOT_VALID_PARAM)
 			.msg(errorMessage)
 			.build();
 	}
@@ -102,7 +103,7 @@ public abstract class MvcExceptionHandler extends ResponseEntityExceptionHandler
 		String httpMethod = ex.getHttpMethod().toString();
 
 		ErrorResponse<ErrorCode> response = ErrorResponse.<ErrorCode>builder()
-			.errorCode(NO_FOUND_RESOURCE)
+			.errorCode(ErrorCode.NO_FOUND_RESOURCE)
 			.msg(String.format("No Found Resource [%1$s] /%2$s", httpMethod, resourcePath))
 			.build();
 
