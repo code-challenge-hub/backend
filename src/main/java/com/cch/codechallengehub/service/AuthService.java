@@ -1,12 +1,11 @@
 package com.cch.codechallengehub.service;
 
-import com.cch.codechallengehub.exception.NotAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,8 +23,8 @@ public class AuthService {
 		Authentication authenticate;
 		try {
 			authenticate = authenticationManager.authenticate(authenticationToken);
-		} catch (AuthenticationException ex) {
-			throw new NotAuthenticationException(ex.getMessage());
+		} catch (BadCredentialsException ex) {
+			throw new BadCredentialsException("Email, Password Not Valid");
 		}
 		String userEmail = authenticate.getName();
 
