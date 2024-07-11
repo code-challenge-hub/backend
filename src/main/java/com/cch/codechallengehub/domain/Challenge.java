@@ -6,9 +6,11 @@ import static org.springframework.util.Assert.notNull;
 
 import com.cch.codechallengehub.constants.ChallengeLevel;
 import com.cch.codechallengehub.constants.ChallengeStatus;
+import com.cch.codechallengehub.converter.StringListToJsonConverter;
 import com.cch.codechallengehub.entity.AuditingEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -65,6 +67,7 @@ public class Challenge extends AuditingEntity {
 
 	@Column(name = "func_requirements", columnDefinition = "json")
 	@JdbcTypeCode(SqlTypes.JSON)
+	@Convert(converter = StringListToJsonConverter.class)
 	private List<String> funcRequirements = new ArrayList<>();
 
 	@Column(name = "view_count")

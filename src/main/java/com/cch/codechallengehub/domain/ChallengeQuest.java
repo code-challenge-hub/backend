@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -54,4 +55,13 @@ public class ChallengeQuest extends AuditingEntity {
 	@Column(name = "orders")
 	private Integer orders;
 
+	@Builder
+	public ChallengeQuest(String questName, LocalDateTime deadline, String questDetail,
+		QuestResultType resultType, Integer orders) {
+		this.questName = questName;
+		this.deadline = deadline;
+		this.questDetail = questDetail;
+		this.resultType = resultType;
+		this.orders = orders;
+	}
 }
