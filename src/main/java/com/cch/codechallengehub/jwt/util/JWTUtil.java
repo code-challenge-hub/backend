@@ -1,41 +1,43 @@
 package com.cch.codechallengehub.jwt.util;
 
+import com.cch.codechallengehub.constants.JwtKey;
+import com.cch.codechallengehub.jwt.adapter.JwtKeyLocator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Locator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JWTUtil {
 
-    private final SecretKey secretKey;
     private final long jwtExpiration;
 
-    public JWTUtil(@Value("${jwt.secret-key}")String secret, @Value("${jwt.expiration-time}")long jwtExpiration) {
-        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+    public JWTUtil(@Value("${jwt.expiration-time}")long jwtExpiration) {
         this.jwtExpiration = jwtExpiration;
     }
 
     public String createJwt(String username, String role) {
+        String keyId = JwtKey.SECRET.getKeyId();
         return Jwts.builder()
+                .header().keyId(keyId).and()
                 .subject(username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(secretKey)
+                .signWith(JwtKeyLocator.getKey(keyId))
                 .compact();
     }
 
     private Claims extractAllClaims(String token) {
+        Locator<Key> keyLocator = getJwtKeyLocator();
         return Jwts
                 .parser()
-                .verifyWith(secretKey)
+                .keyLocator(keyLocator)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -58,4 +60,7 @@ public class JWTUtil {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
+    private Locator<Key> getJwtKeyLocator() {
+        return new JwtKeyLocator();
+    }
 }
