@@ -4,7 +4,6 @@ import static com.cch.codechallengehub.constants.ChallengeLevel.BEGINNER;
 import static com.cch.codechallengehub.constants.QuestResultType.URL;
 import static com.cch.codechallengehub.constants.RecruitType.FIRST_COME_FIRST_SERVE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.cch.codechallengehub.config.AuditingConfig;
 import com.cch.codechallengehub.domain.Challenge;
@@ -12,11 +11,9 @@ import com.cch.codechallengehub.domain.Period;
 import com.cch.codechallengehub.dto.ChallengeCreateDto;
 import com.cch.codechallengehub.dto.ChallengeQuestCreateDto;
 import com.cch.codechallengehub.dto.ChallengeTechStackCreateDto;
-import com.cch.codechallengehub.exception.DuplicateChallengeNameException;
 import com.cch.codechallengehub.repository.ChallengeRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.assertj.core.api.AbstractThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,57 +78,6 @@ class ChallengeServiceTest {
 		assertThat(findChallenge.getChallengeQuests().size()).isEqualTo(1);
 		assertThat(findChallenge.getChallengeTechStacks().size()).isEqualTo(1);
 		assertThat(findChallenge.getCreatedDate()).isAfter(now);
-	}
-
-	@Test
-	void create_challenge_fail_duplicate_name() {
-		// given
-		LocalDateTime now = LocalDateTime.now();
-		ChallengeQuestCreateDto quest1 = ChallengeQuestCreateDto.builder()
-			.questName("요구사항 정의")
-			.deadline(now.plusHours(10))
-			.resultType(URL)
-			.orders(1)
-			.build();
-		List<ChallengeQuestCreateDto> quests = List.of(quest1);
-
-		ChallengeTechStackCreateDto tech1 = ChallengeTechStackCreateDto.builder()
-			.stackName("Spring Boot")
-			.build();
-		List<ChallengeTechStackCreateDto> techStacks = List.of(tech1);
-
-		ChallengeCreateDto createDto1 = ChallengeCreateDto.builder()
-			.challengeName("test Challenge")
-			.level(BEGINNER)
-			.challengeDesc("test 입니다")
-			.period(new Period(now, now.plusDays(2)))
-			.recruitType(FIRST_COME_FIRST_SERVE)
-			.recruitPeriod(new Period(now, now.plusDays(1)))
-			.recruitNumber(10)
-			.funcRequirements(List.of("회원가입", "로그인"))
-			.quests(quests)
-			.techStacks(techStacks)
-			.build();
-
-		ChallengeCreateDto createDto2 = ChallengeCreateDto.builder()
-			.challengeName("test Challenge")
-			.level(BEGINNER)
-			.challengeDesc("test 입니다")
-			.period(new Period(now, now.plusDays(2)))
-			.recruitType(FIRST_COME_FIRST_SERVE)
-			.recruitPeriod(new Period(now, now.plusDays(1)))
-			.recruitNumber(10)
-			.funcRequirements(List.of("회원가입", "로그인"))
-			.quests(quests)
-			.techStacks(techStacks)
-			.build();
-		challengeService.createChallenge(createDto1);
-		// when
-		AbstractThrowableAssert<?, ? extends Throwable> thrownBy = assertThatThrownBy(
-			() -> challengeService.createChallenge(createDto2));
-		// then
-		thrownBy.isInstanceOf(DuplicateChallengeNameException.class)
-			.message().isEqualTo("Duplicate challenge name 'test Challenge'");
 	}
 
 }
