@@ -1,6 +1,7 @@
 package com.cch.codechallengehub.domain;
 
 
+import static com.cch.codechallengehub.constants.ChallengeStatus.*;
 import static org.springframework.util.Assert.notEmpty;
 import static org.springframework.util.Assert.notNull;
 
@@ -22,6 +23,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -86,8 +88,7 @@ public class Challenge extends AuditingEntity {
 	@Builder
 	public Challenge(String challengeName, ChallengeLevel level, String challengeDesc,
 		Period period, Recruit recruit, List<String> funcRequirements, Long viewCount, byte[] thumbnail,
-		List<ChallengeTechStack> challengeTechStacks, List<ChallengeQuest> challengeQuests,
-		ChallengeStatus status) {
+		List<ChallengeTechStack> challengeTechStacks, List<ChallengeQuest> challengeQuests) {
 
 		setChallengeName(challengeName);
 		setLevel(level);
@@ -95,11 +96,11 @@ public class Challenge extends AuditingEntity {
 		setRecruit(recruit);
 		setChallengeTechStacks(challengeTechStacks);
 		setFuncRequirements(funcRequirements);
-		this.status = status;
 		this.challengeDesc = challengeDesc;
 		this.viewCount = viewCount;
 		this.thumbnail = thumbnail;
 		this.challengeQuests = challengeQuests;
+		initStatus();
 	}
 
 	private void setChallengeName(String challengeName) {
@@ -131,6 +132,17 @@ public class Challenge extends AuditingEntity {
 		List<ChallengeTechStack> challengeTechStacks) {
 		notEmpty(challengeTechStacks, "Challenge tech stack is not null!");
 		this.challengeTechStacks = challengeTechStacks;
+	}
+
+	private void initStatus() {
+		Period recruitPeriod = this.recruit.getPeriod();
+		LocalDateTime now = LocalDateTime.now();
+		if (recruitPeriod.isBetween(now)) {
+			this.status = RECRUITING;
+			return;
+		}
+		this.status = READY;
+
 	}
 
 }

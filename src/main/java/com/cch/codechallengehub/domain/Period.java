@@ -30,4 +30,8 @@ public class Period {
 		this.endDate = endDate;
 	}
 
+	public boolean isBetween(LocalDateTime dateTime) {
+		return !dateTime.isBefore(startDate) && !dateTime.isAfter(endDate);
+	}
+
 }

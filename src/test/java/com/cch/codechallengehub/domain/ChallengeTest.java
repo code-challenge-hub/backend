@@ -1,5 +1,7 @@
 package com.cch.codechallengehub.domain;
 
+import static com.cch.codechallengehub.constants.ChallengeStatus.READY;
+import static com.cch.codechallengehub.constants.ChallengeStatus.RECRUITING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cch.codechallengehub.constants.ChallengeLevel;
@@ -99,6 +101,77 @@ class ChallengeTest {
 		// then
 		assertThrow.isInstanceOf(IllegalArgumentException.class)
 			.message().isEqualTo("Challenge recruit info is not null!");
+	}
+
+	/**
+	 * 처음 생성 시 모집 기간 보다 생성일이 빠르면 READY, 모집 기간 사이에 있으면 RECRUITING
+	 */
+	@Test
+	void challenge_create_status_ready() {
+		// given
+		LocalDateTime startDate = LocalDateTime.now();
+		LocalDateTime endDate = startDate.plusDays(30);
+		Period period = new Period(startDate, endDate);
+
+		LocalDateTime recruitStartDate = startDate.plusDays(1);
+		LocalDateTime recruitEndDate = recruitStartDate.plusDays(7);
+		Period recruitPeriod = new Period(recruitStartDate, recruitEndDate);
+		Recruit recruit = Recruit.builder()
+			.period(recruitPeriod)
+			.type(RecruitType.FIRST_COME_FIRST_SERVE)
+			.number(5)
+			.build();
+
+		List<ChallengeQuest> challengeQuests = List.of(new ChallengeQuest());
+		List<ChallengeTechStack> challengeTechStacks = List.of(new ChallengeTechStack());
+		List<String> funcRequirements = List.of("To-Do");
+
+		ChallengeBuilder builder = Challenge.builder()
+			.challengeName("Challenge Ready")
+			.level(ChallengeLevel.BEGINNER)
+			.period(period)
+			.recruit(recruit)
+			.challengeQuests(challengeQuests)
+			.challengeTechStacks(challengeTechStacks)
+			.funcRequirements(funcRequirements);
+		// when
+		Challenge challenge = builder.build();
+		// then
+		assertThat(challenge.getStatus()).isEqualTo(READY);
+	}
+
+	@Test
+	void challenge_create_status_recruiting() {
+		// given
+		LocalDateTime startDate = LocalDateTime.now();
+		LocalDateTime endDate = startDate.plusDays(30);
+		Period period = new Period(startDate, endDate);
+
+		LocalDateTime recruitStartDate = LocalDateTime.now();
+		LocalDateTime recruitEndDate = recruitStartDate.plusDays(7);
+		Period recruitPeriod = new Period(recruitStartDate, recruitEndDate);
+		Recruit recruit = Recruit.builder()
+			.period(recruitPeriod)
+			.type(RecruitType.FIRST_COME_FIRST_SERVE)
+			.number(5)
+			.build();
+
+		List<ChallengeQuest> challengeQuests = List.of(new ChallengeQuest());
+		List<ChallengeTechStack> challengeTechStacks = List.of(new ChallengeTechStack());
+		List<String> funcRequirements = List.of("To-Do");
+
+		ChallengeBuilder builder = Challenge.builder()
+			.challengeName("Challenge Ready")
+			.level(ChallengeLevel.BEGINNER)
+			.period(period)
+			.recruit(recruit)
+			.challengeQuests(challengeQuests)
+			.challengeTechStacks(challengeTechStacks)
+			.funcRequirements(funcRequirements);
+		// when
+		Challenge challenge = builder.build();
+		// then
+		assertThat(challenge.getStatus()).isEqualTo(RECRUITING);
 	}
 
 }

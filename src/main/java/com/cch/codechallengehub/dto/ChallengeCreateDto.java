@@ -1,7 +1,6 @@
 package com.cch.codechallengehub.dto;
 
 import com.cch.codechallengehub.constants.ChallengeLevel;
-import com.cch.codechallengehub.constants.ChallengeStatus;
 import com.cch.codechallengehub.constants.RecruitType;
 import com.cch.codechallengehub.domain.Challenge;
 import com.cch.codechallengehub.domain.ChallengeQuest;
@@ -53,7 +52,6 @@ public class ChallengeCreateDto {
 			.challengeDesc(challengeDesc)
 			.period(period)
 			.recruit(recruit)
-			.status(ChallengeStatus.READY)
 			.challengeQuests(quests)
 			.challengeTechStacks(techStacks)
 			.funcRequirements(funcRequirements)

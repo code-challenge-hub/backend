@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public enum ChallengeStatus {
-	READY
+	READY, RECRUITING, PROCESSING, FINISH, CLOSE
 }
