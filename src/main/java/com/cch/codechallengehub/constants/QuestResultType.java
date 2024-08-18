@@ -4,4 +4,5 @@ import lombok.Getter;
 
 @Getter
 public enum QuestResultType {
+	URL, IMAGE
 }

@@ -1,11 +1,18 @@
 package com.cch.codechallengehub.domain;
 
 
+import static com.cch.codechallengehub.constants.ChallengeStatus.*;
+import static org.springframework.util.Assert.notEmpty;
+import static org.springframework.util.Assert.notNull;
+
 import com.cch.codechallengehub.constants.ChallengeLevel;
 import com.cch.codechallengehub.constants.ChallengeStatus;
-import com.cch.codechallengehub.constants.RecruitType;
+import com.cch.codechallengehub.converter.StringListToJsonConverter;
 import com.cch.codechallengehub.entity.AuditingEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -14,11 +21,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -52,27 +61,15 @@ public class Challenge extends AuditingEntity {
 	@Enumerated(EnumType.STRING)
 	private ChallengeStatus status;
 
-	@Column(name = "start_date")
-	private LocalDateTime startDate;
+	@Embedded
+	private Period period;
 
-	@Column(name = "end_date")
-	private LocalDateTime endDate;
-
-	@Column(name = "recruit_type")
-	@Enumerated(EnumType.STRING)
-	private RecruitType recruitType;
-
-	@Column(name = "recruit_start_date")
-	private LocalDateTime recruitStartDate;
-
-	@Column(name = "recruit_end_date")
-	private LocalDateTime recruitEndDate;
-
-	@Column(name = "recruit_number")
-	private Integer recruitNumber;
+	@Embedded
+	private Recruit recruit;
 
 	@Column(name = "func_requirements", columnDefinition = "json")
 	@JdbcTypeCode(SqlTypes.JSON)
+	@Convert(converter = StringListToJsonConverter.class)
 	private List<String> funcRequirements = new ArrayList<>();
 
 	@Column(name = "view_count")
@@ -81,5 +78,71 @@ public class Challenge extends AuditingEntity {
 	@Column(name = "thumbnail")
 	@Lob
 	private byte[] thumbnail;
+
+	@OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChallengeTechStack> challengeTechStacks = new ArrayList<>();
+
+	@OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ChallengeQuest> challengeQuests = new ArrayList<>();
+
+	@Builder
+	public Challenge(String challengeName, ChallengeLevel level, String challengeDesc,
+		Period period, Recruit recruit, List<String> funcRequirements, Long viewCount, byte[] thumbnail,
+		List<ChallengeTechStack> challengeTechStacks, List<ChallengeQuest> challengeQuests) {
+
+		setChallengeName(challengeName);
+		setLevel(level);
+		setPeriod(period);
+		setRecruit(recruit);
+		setChallengeTechStacks(challengeTechStacks);
+		setFuncRequirements(funcRequirements);
+		this.challengeDesc = challengeDesc;
+		this.viewCount = viewCount;
+		this.thumbnail = thumbnail;
+		this.challengeQuests = challengeQuests;
+		initStatus();
+	}
+
+	private void setChallengeName(String challengeName) {
+		notNull(challengeName, "Challenge name is not null!");
+		this.challengeName = challengeName;
+	}
+
+	private void setLevel(ChallengeLevel level) {
+		notNull(level, "Challenge level is not null!");
+		this.level = level;
+	}
+
+	private void setPeriod(Period period) {
+		notNull(period, "Challenge period is not null!");
+		this.period = period;
+	}
+
+	private void setRecruit(Recruit recruit) {
+		notNull(recruit, "Challenge recruit info is not null!");
+		this.recruit = recruit;
+	}
+
+	private void setFuncRequirements(List<String> funcRequirements) {
+		notNull(funcRequirements, "Challenge function requirements is not null!");
+		this.funcRequirements = funcRequirements;
+	}
+
+	private void setChallengeTechStacks(
+		List<ChallengeTechStack> challengeTechStacks) {
+		notEmpty(challengeTechStacks, "Challenge tech stack is not null!");
+		this.challengeTechStacks = challengeTechStacks;
+	}
+
+	private void initStatus() {
+		Period recruitPeriod = this.recruit.getPeriod();
+		LocalDateTime now = LocalDateTime.now();
+		if (recruitPeriod.isBetween(now)) {
+			this.status = RECRUITING;
+			return;
+		}
+		this.status = READY;
+
+	}
 
 }

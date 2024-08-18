@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -39,4 +40,8 @@ public class ChallengeTechStack extends AuditingEntity {
 	@Column(name = "stack_name")
 	private String stackName;
 
+	@Builder
+	public ChallengeTechStack(String stackName) {
+		this.stackName = stackName;
+	}
 }
