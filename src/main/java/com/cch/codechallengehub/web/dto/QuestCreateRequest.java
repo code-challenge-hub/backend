@@ -30,7 +30,7 @@ public class QuestCreateRequest {
 	private String resultType;
 
 	@NotNull(message = "quest orders must be not null")
-	@Min(value = 0, message = "quest orders must greater than 0")
+	@Min(value = 0, message = "quest orders must greater than or equal to 0")
 	private Integer orders;
 
 }

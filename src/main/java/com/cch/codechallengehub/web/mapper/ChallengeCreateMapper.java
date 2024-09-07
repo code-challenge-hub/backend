@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ChallengeCreateMapper {
 
 	@Mapping(target = "techStacks", qualifiedByName = "techStackToDto")
