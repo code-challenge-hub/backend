@@ -3,12 +3,14 @@ name: ci-cd-dev
 on:
   pull_request:
     branches:
-#      - develop
-      - chore/ci-github-actions
+      - develop
   push:
     branches:
-#      - develop
-      - chore/ci-github-actions
+      - develop
+
+permissions:
+  checks: write
+  pull-requests: write # only required if `comment: true` was enabled
 
 jobs:
   build:
@@ -27,6 +29,7 @@ jobs:
       # Gradle 빌드
       - name: Execute Gradle build
         run: ./gradlew clean build
+      # 테스트 리포트 등록
       - name: Publish Test report
         uses: mikepenz/action-junit-report@v4
         if: always()
