@@ -1,3 +1,37 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: code-challenge-hub
+
+# mysql 설정
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_DATASOURCE_URL}
+    username: ${MYSQL_DATASOURCE_USER}
+    password: ${MYSQL_DATASOURCE_PASSWORD}
+
+# jpa
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+# swagger-ui custom path
+springdoc:
+  api-docs:
+    path: /swagger/api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+# jwt
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  # 1h in millisecond
+  expiration-time: 3600000
+
+apiPrefix: /api/v1
