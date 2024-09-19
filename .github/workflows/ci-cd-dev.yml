@@ -9,8 +9,8 @@ on:
       - develop
 
 permissions:
-  checks: write
-  pull-requests: write # only required if `comment: true` was enabled
+  checks: write # Check 권한
+  pull-requests: write # Comment 권한
 
 jobs:
   build:
