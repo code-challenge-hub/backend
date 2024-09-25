@@ -1,5 +1,6 @@
 package com.cch.codechallengehub.web.exception;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.TypeMismatchException;
@@ -44,6 +45,7 @@ public class MvcExceptionHandler extends ResponseEntityExceptionHandler {
 		BindingResult bindingResult = ex.getBindingResult();
 		List<FieldError> errors = bindingResult.getFieldErrors();
 		String errorMessage = errors.stream()
+			.sorted(Comparator.comparing(FieldError::getField))
 			.map(FieldError::getDefaultMessage)
 			.collect(Collectors.joining("\n"));
 
