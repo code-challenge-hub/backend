@@ -21,7 +21,6 @@ spring:
       hibernate:
         format_sql: true
     database: mysql
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 # swagger-ui custom path
 springdoc:
