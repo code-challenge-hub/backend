@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     env:
-      JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -39,6 +39,11 @@ jobs:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           fail_on_failure: true
       # Upload
-      - name: upload AWS
-        if: github.event_name == 'push' # Push 때 만
-        run: echo "upload AWS!"
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::590183807290:role/cd-role
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Upload AWS S3
+        run: |
+          aws s3 cp /build/libs/code-challenge-hub-0.0.1-SNAPSHOT.jar s3://${{ secrets.BUCKET_NAME }}/
