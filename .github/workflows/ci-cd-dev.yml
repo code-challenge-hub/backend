@@ -47,4 +47,5 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Upload AWS S3
         run: |
+          ls -a
           aws s3 cp /build/libs/code-challenge-hub-0.0.1-SNAPSHOT.jar s3://${{ secrets.BUCKET_NAME }}/
