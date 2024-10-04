@@ -60,4 +60,4 @@ jobs:
       # Upload
       - name: Upload AWS S3
         run: |
-          aws s3 cp ${{ secrets.APP_FILE_NAME }} s3://${{ secrets.BUCKET_NAME }}/
+          aws s3 cp ./${{ secrets.APP_FILE_NAME }} s3://${{ secrets.BUCKET_NAME }}/
