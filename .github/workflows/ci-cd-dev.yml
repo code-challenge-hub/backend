@@ -50,7 +50,7 @@ jobs:
           cat .env
       - name: Zip application
         run: |
-          zip -r ${{ secrets.APP_FILE_NAME }} appspec.yml build/libs/code-challenge-hub-0.0.1-SNAPSHOT.jar scripts/ .env
+          zip -r ${{ secrets.ZIP_FILE_NAME }} appspec.yml build/libs/code-challenge-hub-0.0.1-SNAPSHOT.jar scripts/ .env
       # AWS Credentials
       - name: AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
