@@ -46,7 +46,7 @@ jobs:
           echo "MYSQL_DATASOURCE_URL=${{ secrets.MYSQL_DATASOURCE_URL }}" >> .env
           echo "MYSQL_DATASOURCE_USER=${{ secrets.MYSQL_DATASOURCE_USER }}" >> .env
           echo "MYSQL_DATASOURCE_PASSWORD=${{ secrets.MYSQL_DATASOURCE_PASSWORD }}" >> .env
-          echo "JWT_SECRET_KEY=${{ JWT_SECRET_KEY }}" >> .env
+          echo "JWT_SECRET_KEY=${ JWT_SECRET_KEY }" >> .env
           cat .env
       - name: Zip application
         run: |
