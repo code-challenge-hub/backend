@@ -1,5 +1,6 @@
 package com.cch.codechallengehub.config;
 
+import com.cch.codechallengehub.constants.AuthorizationType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
@@ -30,10 +31,14 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
+        String key = "Bearer Authentication";
+        String refreshKey = "Refresh Token";
+
         return new OpenAPI().addSecurityItem(new SecurityRequirement().
-                        addList("Bearer Authentication"))
+                        addList(key).addList(refreshKey))
                 .components(new Components().addSecuritySchemes
-                        ("Bearer Authentication", createAPIKeyScheme()))
+                        (key, createAPIKeyScheme())
+                        .addSecuritySchemes(refreshKey, createRefreshTokenSecurityScheme()))
                 .info(apiInfo())
                 .servers(apiServers())
                 .paths(paths());
@@ -52,6 +57,13 @@ public class SwaggerConfig {
         return List.of(new Server().url("http://localhost:8080").description("local"));
     }
 
+    private SecurityScheme createRefreshTokenSecurityScheme() {
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.COOKIE)
+                .name(AuthorizationType.REFRESH_TOKEN.name()); //cookie name
+    }
+
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
                 .bearerFormat("JWT")
@@ -59,7 +71,7 @@ public class SwaggerConfig {
     }
 
     private Paths paths() {
-        return new Paths().addPathItem(apiPrefix + "/auth/login", login());
+        return new Paths().addPathItem(apiPrefix + "/auth/login", login()).addPathItem(apiPrefix + "/auth/logout",logout());
     }
 
     private PathItem login() {
@@ -82,7 +94,23 @@ public class SwaggerConfig {
                                         .description("Successful login")
                                         .addHeaderObject("Authorization", new Header()
                                                 .description("JWT Token")
+                                                .schema(new Schema<>().type("string")))
+                                        .addHeaderObject("Set-Cookie", new Header()
+                                                .description("Refresh Token")
                                                 .schema(new Schema<>().type("string"))))
+                                .addApiResponse("401", new ApiResponse()
+                                        .description("Unauthorized"))));
+    }
+
+    private PathItem logout() {
+        return new PathItem()
+                .post(new io.swagger.v3.oas.models.Operation()
+                        .addTagsItem("auth")
+                        .summary("Logout")
+                        .description("User logout")
+                        .responses(new ApiResponses()
+                                .addApiResponse("200", new ApiResponse()
+                                        .description("Successful logout"))
                                 .addApiResponse("401", new ApiResponse()
                                         .description("Unauthorized"))));
     }

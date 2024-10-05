@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.jwt.util;
+package com.cch.codechallengehub.token.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,12 +22,18 @@ public class JWTUtil {
         this.jwtExpiration = jwtExpiration;
     }
 
-    public String createJwt(String username, String role) {
+    public String createJwt(String category, String username, String role, String ip) {
+        return createJwt(category, username, role, ip, jwtExpiration);
+    }
+
+    public String createJwt(String category, String username, String role, String ip, Long expiredMs) {
         return Jwts.builder()
                 .subject(username)
+                .claim("category", category)
                 .claim("role", role)
+                .claim("ip", ip)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
     }
@@ -52,6 +58,14 @@ public class JWTUtil {
 
     public String getRole(String token) {
         return extractAllClaims(token).get("role", String.class);
+    }
+
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
+
+    public String getIp(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("ip", String.class);
     }
 
     public Boolean isExpired(String token) {

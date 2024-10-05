@@ -3,6 +3,7 @@ package com.cch.codechallengehub.domain;
 import com.cch.codechallengehub.entity.AuditingEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,4 +33,19 @@ public class Profile extends AuditingEntity {
 
     @Column(name = "career")
     private Integer career;
+
+    @Builder
+    public Profile(User user, String introduction, String job, Integer career) {
+        this.user = user;
+        this.introduction = introduction;
+        this.job = job;
+        this.career = career;
+    }
+
+    public void updateProfile(String introduction, String job, Integer career) {
+        this.introduction = introduction;
+        this.job = job;
+        this.career = career;
+    }
+
 }

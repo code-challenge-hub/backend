@@ -1,12 +1,14 @@
 package com.cch.codechallengehub.filter;
 
+import com.cch.codechallengehub.constants.AuthorizationType;
 import com.cch.codechallengehub.dto.CustomUserDetails;
-import com.cch.codechallengehub.dto.JoinDTO;
-import com.cch.codechallengehub.jwt.util.JWTUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cch.codechallengehub.token.util.JWTUtil;
+import com.cch.codechallengehub.token.util.RefreshTokenUtil;
+import com.cch.codechallengehub.util.CommonUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,19 +16,19 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.stream.Collectors;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
-    //private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final RefreshTokenUtil refreshTokenUtil;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, String filterProcessesUrl) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenUtil refreshTokenUtil, String filterProcessesUrl) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenUtil = refreshTokenUtil;
         setFilterProcessesUrl(filterProcessesUrl);
     }
 
@@ -35,19 +37,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String email = request.getParameter("email");
         String password = obtainPassword(request);
-
-        /*String email = null;
-        String password = null;
-        try{
-            JoinDTO loginDto = objectMapper.readValue(
-                    request.getReader().lines().collect(Collectors.joining()), JoinDTO.class);
-
-            email = loginDto.getEmail();
-            password = loginDto.getPassword();
-
-        } catch(IOException e){
-            e.printStackTrace();
-        }*/
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
 
@@ -66,14 +55,22 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
 
         String role = auth.getAuthority();
+        String ip = CommonUtil.getRemoteIP(request);
 
-        String token = jwtUtil.createJwt(username, role);
+        String token = jwtUtil.createJwt(AuthorizationType.ACCESS_TOKEN.name(),username, role , ip);
+        String refresh = jwtUtil.createJwt(AuthorizationType.REFRESH_TOKEN.name(),username, role, ip,14400000L);
+
+        refreshTokenUtil.saveRefreshToken(username, refresh);
 
         response.addHeader("Authorization", "Bearer " + token);
+        response.addCookie(refreshTokenUtil.createCookie(refresh));
+        response.setStatus(HttpStatus.OK.value());
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         response.setStatus(401);
     }
+
+
 }
