@@ -48,3 +48,7 @@ tasks.named('test') {
 test {
 	systemProperty 'spring.profiles.active', 'test'
 }
+
+jar {
+	archiveFileName.set('code-challenge-hub.jar')
+}
