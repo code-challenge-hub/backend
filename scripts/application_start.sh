@@ -1,0 +1,1 @@
+nohup java -jar /home/ec2-user/app/code-challenge-hub.jar > /dev/null 2&1 &
