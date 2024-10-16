@@ -5,14 +5,14 @@ spring:
   application:
     name: code-challenge-hub
 
-# mysql 설정
+  # mysql 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${MYSQL_DATASOURCE_URL}
     username: ${MYSQL_DATASOURCE_USER}
     password: ${MYSQL_DATASOURCE_PASSWORD}
 
-# jpa
+  # jpa
   jpa:
     show-sql: true
     hibernate:
@@ -20,7 +20,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database: mysql
 
 # swagger-ui custom path
 springdoc:
