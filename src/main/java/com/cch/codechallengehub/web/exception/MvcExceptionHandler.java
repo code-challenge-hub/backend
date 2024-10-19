@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -110,6 +111,32 @@ public class MvcExceptionHandler extends ResponseEntityExceptionHandler {
 			.build();
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
+
+	// 비지니스 유효성 검증 실패
+	@ExceptionHandler(CustomValidationException.class)
+	public ResponseEntity<Object> handleCustomValidationException(CustomValidationException ex) {
+		String errorMessage = ex.getMessage();
+		ErrorResponse<ErrorCode> response = getBadRequestErrorResponse(errorMessage);
+
+		return ResponseEntity.status(ex.getStatus()).body(response);
+	}
+
+	@ExceptionHandler({AuthException.class,TokenException.class})
+	public ResponseEntity<Object> handleAuthExceptions(RuntimeException ex) {
+
+		HttpStatus status = HttpStatus.UNAUTHORIZED;
+
+		if (ex instanceof ExceptionBase) {
+			status = ((ExceptionBase) ex).getHttpStatus();
+		}
+
+		ErrorResponse<ErrorCode> response = ErrorResponse.<ErrorCode>builder()
+				.errorCode(ErrorCode.AUTH_INVALID)
+				.msg(ex.getMessage())
+				.build();
+
+		return ResponseEntity.status(status).body(response);
 	}
 
 }
