@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.controller;
+package com.cch.codechallengehub.web.controller;
 
 import com.cch.codechallengehub.dto.UserDto;
 import com.cch.codechallengehub.service.AuthService;
@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "${apiPrefix}/auth")
+@RequestMapping(path = "${apiPrefix}")
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/join")
+    @PostMapping("/v1/auth/join")
     public ResponseEntity<Void> joinProcess(@RequestBody @Valid UserDto userDto) {
         authService.joinProcess(userDto);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/reissue")
+    @PostMapping("/v1/auth/reissue")
     public ResponseEntity<Void> reisuue(HttpServletRequest request, HttpServletResponse response) {
         authService.reisuue(request, response);
         return ResponseEntity.ok().build();
