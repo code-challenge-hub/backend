@@ -12,7 +12,7 @@ else
 fi
 
 sudo dnf update -y
-sudo dnf install -y java-17-openjdk
+sudo dnf install -y https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.rpm
 
 if type -p java; then
   echo "Java install successfully"
