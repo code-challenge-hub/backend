@@ -69,6 +69,13 @@ jobs:
     env:
       ENVIRONMENT: dev
     steps:
+      # AWS Credentials
+      - name: AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::590183807290:role/cd-role
+          aws-region: ${{ secrets.AWS_REGION }}
+      # AWS Code deploy
       - name: AWS code deploy
         run: |
           aws deploy create-deployment \
