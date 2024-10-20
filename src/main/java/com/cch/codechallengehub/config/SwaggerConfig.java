@@ -71,7 +71,7 @@ public class SwaggerConfig {
     }
 
     private Paths paths() {
-        return new Paths().addPathItem(apiPrefix + "/auth/login", login()).addPathItem(apiPrefix + "/auth/logout",logout());
+        return new Paths().addPathItem(apiPrefix + "/v1/auth/login", login()).addPathItem(apiPrefix + "/v1/auth/logout",logout());
     }
 
     private PathItem login() {

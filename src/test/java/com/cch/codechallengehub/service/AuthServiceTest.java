@@ -6,8 +6,7 @@ import com.cch.codechallengehub.dto.UserDto;
 import com.cch.codechallengehub.repository.UserRepository;
 import com.cch.codechallengehub.token.util.JWTUtil;
 import com.cch.codechallengehub.token.util.RefreshTokenUtil;
-import com.cch.codechallengehub.web.exception.CustomValidationException;
-import com.cch.codechallengehub.web.exception.TokenException;
+import com.cch.codechallengehub.web.exception.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +81,7 @@ class AuthServiceTest {
                 .build();
 
         // when & then
-        CustomValidationException exception = assertThrows(CustomValidationException.class, () -> authService.joinProcess(userDto));
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> authService.joinProcess(userDto));
         assertEquals("This email already exists.", exception.getMessage());
     }
 
@@ -95,7 +94,7 @@ class AuthServiceTest {
         when(request.getCookies()).thenReturn(null);
 
         // when & then
-        TokenException exception = assertThrows(TokenException.class, () -> authService.reisuue(request, response));
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> authService.reisuue(request, response));
         assertEquals("refresh token null", exception.getMessage());
     }
 }
