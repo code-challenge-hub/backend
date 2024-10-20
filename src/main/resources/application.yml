@@ -17,7 +17,7 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: 6379
-      password: 1234
+      password: ${REDIS_PASSWORD}
 
   # jpa
   jpa:
@@ -41,4 +41,4 @@ jwt:
   # 10m in millisecond
   expiration-time: 60000
 
-apiPrefix: /api/v1
+apiPrefix: /api
