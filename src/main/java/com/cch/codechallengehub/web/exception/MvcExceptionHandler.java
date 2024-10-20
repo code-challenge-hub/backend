@@ -113,30 +113,13 @@ public class MvcExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 	}
 
-	// 비지니스 유효성 검증 실패
-	@ExceptionHandler(CustomValidationException.class)
-	public ResponseEntity<Object> handleCustomValidationException(CustomValidationException ex) {
+	@ExceptionHandler({ExceptionBase.class})
+	public ResponseEntity<Object> handleCustomExceptions(ExceptionBase ex) {
+
 		String errorMessage = ex.getMessage();
 		ErrorResponse<ErrorCode> response = getBadRequestErrorResponse(errorMessage);
 
 		return ResponseEntity.status(ex.getStatus()).body(response);
-	}
-
-	@ExceptionHandler({AuthException.class,TokenException.class})
-	public ResponseEntity<Object> handleAuthExceptions(RuntimeException ex) {
-
-		HttpStatus status = HttpStatus.UNAUTHORIZED;
-
-		if (ex instanceof ExceptionBase) {
-			status = ((ExceptionBase) ex).getHttpStatus();
-		}
-
-		ErrorResponse<ErrorCode> response = ErrorResponse.<ErrorCode>builder()
-				.errorCode(ErrorCode.AUTH_INVALID)
-				.msg(ex.getMessage())
-				.build();
-
-		return ResponseEntity.status(status).body(response);
 	}
 
 }

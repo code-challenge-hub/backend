@@ -9,15 +9,14 @@ import com.cch.codechallengehub.repository.UserRepository;
 import com.cch.codechallengehub.token.util.JWTUtil;
 import com.cch.codechallengehub.token.util.RefreshTokenUtil;
 import com.cch.codechallengehub.util.CommonUtil;
-import com.cch.codechallengehub.web.exception.CustomValidationException;
-import com.cch.codechallengehub.web.exception.TokenException;
+import com.cch.codechallengehub.web.exception.AccessDeniedException;
+import com.cch.codechallengehub.web.exception.BadRequestException;
+import com.cch.codechallengehub.web.exception.UnauthorizedException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +40,7 @@ public class AuthService {
         Boolean isExist = userRepository.existsByEmail(email);
 
         if (isExist) {
-            throw new CustomValidationException("This email already exists.");
+            throw new BadRequestException("This email already exists.");
         }
 
         User data = User.builder()
@@ -60,7 +59,7 @@ public class AuthService {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
-            throw new TokenException("refresh token null");
+            throw new BadRequestException("refresh token null");
         }
 
         for (Cookie cookie : cookies) {
@@ -69,19 +68,19 @@ public class AuthService {
             }
         }
         if (refresh == null) {
-            throw new TokenException("refresh token null");
+            throw new BadRequestException("refresh token null");
         }
 
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {
-            throw new TokenException("refresh token expired" , HttpStatus.FORBIDDEN);
+            throw new AccessDeniedException("refresh token expired");
         }
 
         String category = jwtUtil.getCategory(refresh);
 
         if (!category.equals(AuthorizationType.REFRESH_TOKEN.name())) {
-            throw new TokenException("refresh token expired", HttpStatus.FORBIDDEN);
+            throw new AccessDeniedException("refresh token expired");
         }
         String request_ip = CommonUtil.getRemoteIP(request);
         String ip = jwtUtil.getIp(refresh);
@@ -89,7 +88,7 @@ public class AuthService {
 
         if(!request_ip.equals(ip)){
             refreshTokenUtil.deleteRefreshToken(email);
-            throw new TokenException("Suspicious activity detected. Your token has been terminated for security reasons. Please log in again.", HttpStatus.UNAUTHORIZED);
+            throw new UnauthorizedException("Suspicious activity detected. Your token has been terminated for security reasons. Please log in again.");
         }
 
         String role = jwtUtil.getRole(refresh);
@@ -98,12 +97,12 @@ public class AuthService {
         //없다면 리프레쉬토큰 초기화 ( 로그아웃 )
         Optional<RefreshToken> redisToken = refreshTokenUtil.getRefreshToken(email);
         if(redisToken.isEmpty()){
-            throw new TokenException("refresh token expired", HttpStatus.FORBIDDEN);
+            throw new AccessDeniedException("refresh token expired");
         }
 
         if(!redisToken.get().getRefreshToken().equals(refresh)){
             refreshTokenUtil.deleteRefreshToken(email);
-            throw new TokenException("Suspicious activity detected. Your token has been terminated for security reasons. Please log in again.", HttpStatus.UNAUTHORIZED);
+            throw new UnauthorizedException("Suspicious activity detected. Your token has been terminated for security reasons. Please log in again.");
         }
 
         String newAccess = jwtUtil.createJwt(AuthorizationType.ACCESS_TOKEN.name(), email, role, request_ip);
