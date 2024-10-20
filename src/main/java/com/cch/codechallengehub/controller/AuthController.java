@@ -1,29 +1,34 @@
 package com.cch.codechallengehub.controller;
 
-import com.cch.codechallengehub.dto.JoinDTO;
+import com.cch.codechallengehub.dto.UserDto;
 import com.cch.codechallengehub.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@ResponseBody
+
+@RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "${apiPrefix}/auth")
 public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
-
     @PostMapping("/join")
-    public ResponseEntity<?> joinProcess(JoinDTO joinDTO) {
-        authService.joinProcess(joinDTO);
-        return ResponseEntity.ok()
-                .build();
+    public ResponseEntity<Void> joinProcess(@RequestBody @Valid UserDto userDto) {
+        authService.joinProcess(userDto);
+        return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/reissue")
+    public ResponseEntity<Void> reisuue(HttpServletRequest request, HttpServletResponse response) {
+        authService.reisuue(request, response);
+        return ResponseEntity.ok().build();
+    }
 }

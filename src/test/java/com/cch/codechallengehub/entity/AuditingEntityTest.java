@@ -26,7 +26,11 @@ class AuditingEntityTest {
     @Test
     void input_created_date() {
         // given
-        User testUser = new User("test1", "gagga@gmail.com", "123");
+        User testUser = User.builder()
+                            .nickname("test1")
+                            .email("gagga@gmail.com")
+                            .password("123")
+                            .build();
         // when
         em.persist(testUser);
         // then
@@ -37,8 +41,11 @@ class AuditingEntityTest {
     @Test
     void input_modified_date() throws Exception {
         // given
-        User testUser = new User("test1", "gagga@gmail.com", "123");
-
+        User testUser = User.builder()
+                            .nickname("test1")
+                            .email("gagga@gmail.com")
+                            .password("123")
+                            .build();
         // when
         em.persist(testUser);
         Thread.sleep(500);
