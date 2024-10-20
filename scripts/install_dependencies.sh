@@ -11,8 +11,8 @@ else
   echo "Java is not installed"
 fi
 
-sudo yum update -y
-sudo yum install -y java-17-openjdk
+sudo dnf update -y
+sudo dnf install -y java-17-openjdk
 
 if type -p java; then
   echo "Java install successfully"
