@@ -1,2 +1,2 @@
 export $(cat /home/ec2-user/app/.env  | xargs -d '\n')
-nohup java -jar /home/ec2-user/app/code-challenge-hub.jar > server.log 2>&1 &
+nohup java -jar /home/ec2-user/app/code-challenge-hub.jar > /home/ec2-user/app/server.log 2>&1 &
