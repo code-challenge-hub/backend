@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.controller;
+package com.cch.codechallengehub.web.controller;
 
 import com.cch.codechallengehub.dto.UserDto;
 import com.cch.codechallengehub.security.CommonSecurityTest;
@@ -47,7 +47,7 @@ public class AuthControllerTest  extends CommonSecurityTest {
         String requestJson = objectMapper.writeValueAsString(userDto);
 
         // when & then
-        mockMvc.perform(post(BASE_URL +"/auth/join")
+        mockMvc.perform(post(BASE_URL +"/v1/auth/join")
                         .contentType(APPLICATION_JSON)
                         .content(requestJson))
                         .andExpect(status().isOk())
@@ -70,7 +70,7 @@ public class AuthControllerTest  extends CommonSecurityTest {
         String requestJson = objectMapper.writeValueAsString(userDto);
 
         // when & then
-        mockMvc.perform(post(BASE_URL +"/auth/join")
+        mockMvc.perform(post(BASE_URL +"/v1/auth/join")
                         .contentType(APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest())
@@ -82,7 +82,7 @@ public class AuthControllerTest  extends CommonSecurityTest {
     void reissue_success() throws Exception {
         doNothing().when(authService).reisuue(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
         // when & then
-        mockMvc.perform(post(BASE_URL +"/auth/reissue")
+        mockMvc.perform(post(BASE_URL +"/v1/auth/reissue")
                         .contentType(APPLICATION_JSON))
                         .andExpect(status().isOk());
 
