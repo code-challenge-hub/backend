@@ -4,7 +4,9 @@ on:
   pull_request:
     branches:
       - develop
-  push:
+  pull_request_target:
+    types:
+      - closed
     branches:
       - develop
 
@@ -36,12 +38,12 @@ jobs:
       # 테스트 리포트 등록
       - name: Publish Test report
         uses: mikepenz/action-junit-report@v4
-        if: always()
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           fail_on_failure: true
       # 환경 변수 쓰기
       - name: Create env file
+        if: ${{ github.event.pull_request.merged == true }}
         run: |
           echo "SPRING_PROFILES_ACTIVE=$ENVIRONMENT" > .env
           echo "MYSQL_DATASOURCE_URL=${{ secrets.MYSQL_DATASOURCE_URL }}" >> .env
@@ -49,22 +51,27 @@ jobs:
           echo "MYSQL_DATASOURCE_PASSWORD=${{ secrets.MYSQL_DATASOURCE_PASSWORD }}" >> .env
           echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
           echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-          cat .env
+      # 아래 부터는 배포를 위한 과정
+      # 파일 패키징
       - name: Zip application
+        if: ${{ github.event.pull_request.merged == true }}
         run: |
           zip -r ${{ secrets.ZIP_FILE_NAME }} appspec.yml build/libs/code-challenge-hub.jar scripts/ .env
       # AWS Credentials
       - name: AWS credentials
+        if: ${{ github.event.pull_request.merged == true }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::590183807290:role/cd-role
           aws-region: ${{ secrets.AWS_REGION }}
       # Upload
       - name: Upload AWS S3
+        if: ${{ github.event.pull_request.merged == true }}
         run: |
           aws s3 cp ${{ secrets.ZIP_FILE_NAME }} s3://${{ secrets.BUCKET_NAME }}/
   deploy:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     needs: [build]
     environment: dev
     env:
