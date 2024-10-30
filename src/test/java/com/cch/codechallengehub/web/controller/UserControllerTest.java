@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.controller;
+package com.cch.codechallengehub.web.controller;
 
 import com.cch.codechallengehub.dto.PasswordDto;
 import com.cch.codechallengehub.dto.ProfileDto;
@@ -48,7 +48,7 @@ class UserControllerTest extends CommonSecurityTest {
         String requestJson = objectMapper.writeValueAsString(profileDto);
 
         // when & then
-        mockMvc.perform(get(BASE_URL +"/user/profile"))
+        mockMvc.perform(get(BASE_URL +"/v1/user/profile"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(requestJson))
                 .andDo(print());
@@ -59,7 +59,7 @@ class UserControllerTest extends CommonSecurityTest {
     @DisplayName("인증되지않은사용자 - getProfile API 실패")
     void getProfile_noAuthenticatedUser_fail() throws Exception {
         // when & then
-        mockMvc.perform(get(BASE_URL +"/user/profile")
+        mockMvc.perform(get(BASE_URL +"/v1/user/profile")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andDo(print());
@@ -75,7 +75,7 @@ class UserControllerTest extends CommonSecurityTest {
         String requestJson = objectMapper.writeValueAsString(profileDto);
 
         // when & then
-        mockMvc.perform(post(BASE_URL + "/user/profile")
+        mockMvc.perform(post(BASE_URL + "/v1/user/profile")
                         .content(requestJson)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -90,7 +90,7 @@ class UserControllerTest extends CommonSecurityTest {
         ProfileDto profileDto = new ProfileDto();
 
         // when & then
-        mockMvc.perform(post(BASE_URL +"/user/profile")
+        mockMvc.perform(post(BASE_URL +"/v1/user/profile")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andDo(print());
@@ -106,7 +106,7 @@ class UserControllerTest extends CommonSecurityTest {
         String requestJson = objectMapper.writeValueAsString(passwordDto);
 
         // when & then
-        mockMvc.perform(patch(BASE_URL +"/user/password")
+        mockMvc.perform(patch(BASE_URL +"/v1/user/password")
                         .contentType(APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk());
@@ -124,7 +124,7 @@ class UserControllerTest extends CommonSecurityTest {
         String requestJson = objectMapper.writeValueAsString(passwordDto);
 
         // when & then
-        mockMvc.perform(patch(BASE_URL +"/user/password")
+        mockMvc.perform(patch(BASE_URL +"/v1/user/password")
                         .contentType(APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest());
@@ -134,7 +134,7 @@ class UserControllerTest extends CommonSecurityTest {
     @DisplayName("인증되지않은사용자 - changePassword API 실패")
     void changePassword_noAuthenticatedUser_fail() throws Exception {
         // when & then
-        mockMvc.perform(patch(BASE_URL +"/user/password")
+        mockMvc.perform(patch(BASE_URL +"/v1/user/password")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andDo(print());

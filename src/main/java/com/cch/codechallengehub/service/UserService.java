@@ -6,10 +6,10 @@ import com.cch.codechallengehub.dto.PasswordDto;
 import com.cch.codechallengehub.dto.ProfileDto;
 import com.cch.codechallengehub.repository.ProfileRepository;
 import com.cch.codechallengehub.repository.UserRepository;
-import com.cch.codechallengehub.web.exception.CustomValidationException;
+import com.cch.codechallengehub.web.exception.BadRequestException;
+import com.cch.codechallengehub.web.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(username);
 
         if (user.isEmpty()) {
-            throw new CustomValidationException("User not found with email: " + username,HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("User not found with email: " + username);
         }
 
         Optional<Profile> existingProfile = profileRepository.findByUserEmail(username);
@@ -60,11 +60,11 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(username);
 
         if (user.isEmpty()) {
-            throw new CustomValidationException("User not found with email: " + username,HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("User not found with email: " + username);
         }
 
         if(passwordEncoder.matches(passwordDto.getPassword(),user.get().getPassword())){
-            throw new CustomValidationException("This is the same password as before.");
+            throw new BadRequestException("This is the same password as before.");
         }
 
         User updateUser = user.get();

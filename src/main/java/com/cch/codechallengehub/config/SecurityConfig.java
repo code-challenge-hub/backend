@@ -40,7 +40,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String permitUrl = apiPrefix+"/auth";
+        String permitUrl = apiPrefix+"/v1/auth";
         http
                 .cors(cors -> cors.disable())
                 .csrf((auth) -> auth.disable())
@@ -52,10 +52,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                                                 .requestMatchers("/swagger-resources/**","/swagger-ui/**", "/swagger/**").permitAll()
                                                 .requestMatchers(permitUrl+"/**").permitAll()
+                                                .requestMatchers("/error","/favicon.ico").permitAll()
                                                 .anyRequest().authenticated())
                 .addFilterBefore(new JWTFilter(jwtUtil,permitUrl), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenUtil, apiPrefix+"/auth/login"), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenUtil, apiPrefix+"/auth/logout"), LogoutFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/login"), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/logout"), LogoutFilter.class);
         return http.build();
     }
 

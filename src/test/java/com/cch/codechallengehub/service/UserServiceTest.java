@@ -7,7 +7,8 @@ import com.cch.codechallengehub.dto.PasswordDto;
 import com.cch.codechallengehub.dto.ProfileDto;
 import com.cch.codechallengehub.repository.ProfileRepository;
 import com.cch.codechallengehub.repository.UserRepository;
-import com.cch.codechallengehub.web.exception.CustomValidationException;
+import com.cch.codechallengehub.web.exception.BadRequestException;
+import com.cch.codechallengehub.web.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -107,8 +108,8 @@ class UserServiceTest {
         String nonexistentuser = "nonexistentuser@example.com";
 
         // when & then
-        CustomValidationException exception =
-                assertThrows(CustomValidationException.class, () ->
+        ResourceNotFoundException exception =
+                assertThrows(ResourceNotFoundException.class, () ->
                 userService.setProfile(nonexistentuser, profileDto));
 
         assertThat(exception.getMessage()).isEqualTo("User not found with email: " + nonexistentuser);
@@ -139,7 +140,7 @@ class UserServiceTest {
                 .build();
 
         // when & then
-        CustomValidationException exception = assertThrows(CustomValidationException.class, () ->
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
                 userService.changePassword(testUserEmail, passwordDto));
         assertThat(exception.getMessage()).isEqualTo("This is the same password as before.");
     }
@@ -154,7 +155,7 @@ class UserServiceTest {
         String nonexistentuser = "nonexistentuser@example.com";
 
         // when & then
-        CustomValidationException exception = assertThrows(CustomValidationException.class, () ->
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
                 userService.changePassword(nonexistentuser, passwordDto));
         assertThat(exception.getMessage()).isEqualTo("User not found with email: "+nonexistentuser);
     }
