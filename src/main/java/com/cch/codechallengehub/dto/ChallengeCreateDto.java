@@ -29,7 +29,9 @@ public class ChallengeCreateDto {
 	private Integer recruitNumber;
 	private List<String> funcRequirements;
 
+	@Builder.Default
 	private List<ChallengeQuestCreateDto> quests = new ArrayList<>();
+	@Builder.Default
 	private List<ChallengeTechStackCreateDto> techStacks = new ArrayList<>();
 
 	public Challenge toEntity() {

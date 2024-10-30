@@ -52,10 +52,12 @@ public class ChallengeCreateRequest {
 	private List<String> funcRequirements;
 
 	@NotEmpty(message = "challenge tech stacks must not be empty")
+	@Builder.Default
 	private List<String> techStacks = new ArrayList<>();
 
 	@Valid
 	@NotEmpty(message = "challenge quests must not be empty")
+	@Builder.Default
 	private List<QuestCreateRequest> quests = new ArrayList<>();
 
 }
