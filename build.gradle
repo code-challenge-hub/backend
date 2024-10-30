@@ -31,6 +31,7 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.6.0'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
@@ -38,6 +39,9 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation group: 'com.github.codemonstur', name: 'embedded-redis', version: '1.4.1'
 	testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '6.3.3'
