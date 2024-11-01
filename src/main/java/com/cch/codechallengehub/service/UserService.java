@@ -2,12 +2,12 @@ package com.cch.codechallengehub.service;
 
 import com.cch.codechallengehub.domain.Profile;
 import com.cch.codechallengehub.domain.User;
-import com.cch.codechallengehub.dto.PasswordDto;
-import com.cch.codechallengehub.dto.ProfileDto;
+import com.cch.codechallengehub.dto.user.PasswordDto;
+import com.cch.codechallengehub.dto.user.ProfileDto;
 import com.cch.codechallengehub.repository.ProfileRepository;
 import com.cch.codechallengehub.repository.UserRepository;
-import com.cch.codechallengehub.web.exception.BadRequestException;
-import com.cch.codechallengehub.web.exception.ResourceNotFoundException;
+import com.cch.codechallengehub.web.exception.custom.BadRequestException;
+import com.cch.codechallengehub.web.exception.custom.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

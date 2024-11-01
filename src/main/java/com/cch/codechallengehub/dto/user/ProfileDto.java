@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.dto;
+package com.cch.codechallengehub.dto.user;
 
 import com.cch.codechallengehub.domain.Profile;
 import lombok.AllArgsConstructor;
@@ -14,14 +14,6 @@ public class ProfileDto {
     private String introduction;
     private String job;
     private Integer career;
-
-    public Profile toEntity() {
-        return Profile.builder()
-                .introduction(introduction)
-                .job(job)
-                .career(career)
-                .build();
-    }
 
     public static ProfileDto toDto(Profile profile) {
 
