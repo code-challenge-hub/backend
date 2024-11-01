@@ -1,7 +1,7 @@
 package com.cch.codechallengehub.filter;
 
 import com.cch.codechallengehub.constants.AuthorizationType;
-import com.cch.codechallengehub.dto.CustomUserDetails;
+import com.cch.codechallengehub.dto.security.CustomUserDetails;
 import com.cch.codechallengehub.token.util.JWTUtil;
 import com.cch.codechallengehub.token.util.RefreshTokenUtil;
 import com.cch.codechallengehub.util.CommonUtil;
@@ -69,7 +69,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        response.setStatus(401);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
     }
 
 
