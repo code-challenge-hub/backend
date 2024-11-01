@@ -1,8 +1,10 @@
 package com.cch.codechallengehub.web.controller;
 
-import com.cch.codechallengehub.dto.UserDto;
+import com.cch.codechallengehub.dto.user.UserDto;
 import com.cch.codechallengehub.security.CommonSecurityTest;
 import com.cch.codechallengehub.service.AuthService;
+import com.cch.codechallengehub.web.dto.user.UserCreateRequest;
+import com.cch.codechallengehub.web.mapper.user.UserCreateMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,19 +34,27 @@ public class AuthControllerTest  extends CommonSecurityTest {
     private MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
     @MockBean private AuthService authService;
+    @MockBean private  UserCreateMapper userCreateMapper;
 
     @Test
     @DisplayName("joinProcess API 성공")
     void joinProcess_success() throws Exception {
         //given
         doNothing().when(authService).joinProcess(Mockito.any(UserDto.class));
+        UserCreateRequest request = UserCreateRequest.builder()
+                                                    .nickname("test")
+                                                    .email("test@test.com")
+                                                    .password("qwe123!")
+                                                    .role("USER")
+                                                    .build();
         UserDto userDto = UserDto.builder()
                         .nickname("test")
                         .email("test@test.com")
                         .password("qwe123!")
                         .role("USER")
                         .build();
-        String requestJson = objectMapper.writeValueAsString(userDto);
+        when(userCreateMapper.requestToDto(any(UserCreateRequest.class))).thenReturn(userDto);
+        String requestJson = objectMapper.writeValueAsString(request);
 
         // when & then
         mockMvc.perform(post(BASE_URL +"/v1/auth/join")

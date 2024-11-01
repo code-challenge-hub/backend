@@ -1,17 +1,18 @@
-package com.cch.codechallengehub.dto;
+package com.cch.codechallengehub.web.dto.user;
 
-import com.cch.codechallengehub.domain.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-
+public class UserCreateRequest {
     @NotBlank(message = "nickname cannot be blank")
     private String nickname;
 
@@ -24,13 +25,4 @@ public class UserDto {
     private String password;
 
     private String role;
-
-    public User toEntity() {
-        return User.builder()
-                .nickname(nickname)
-                .email(email)
-                .password(password)
-                .role(role)
-                .build();
-    }
 }
