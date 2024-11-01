@@ -5,6 +5,7 @@ import com.cch.codechallengehub.filter.JWTFilter;
 import com.cch.codechallengehub.filter.LoginFilter;
 import com.cch.codechallengehub.token.util.JWTUtil;
 import com.cch.codechallengehub.token.util.RefreshTokenUtil;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().dispatcherTypeMatchers(DispatcherType.ERROR);
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         String permitUrl = apiPrefix+"/v1/auth";
         http
@@ -47,13 +54,12 @@ public class SecurityConfig {
                 .formLogin((auth) -> auth.disable())
                 .httpBasic((auth) -> auth.disable())
                 .sessionManagement((session) -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests((auth) -> auth
-                                                .requestMatchers("/swagger-resources/**","/swagger-ui/**", "/swagger/**").permitAll()
-                                                .requestMatchers(permitUrl+"/**").permitAll()
-                                                .requestMatchers("/error","/favicon.ico").permitAll()
-                                                .anyRequest().authenticated())
+                        .requestMatchers("/swagger-resources/**","/swagger-ui/**", "/swagger/**").permitAll()
+                        .requestMatchers(permitUrl+"/**").permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(new JWTFilter(jwtUtil,permitUrl), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/login"), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/logout"), LogoutFilter.class);
