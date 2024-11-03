@@ -19,5 +19,4 @@ public class ChallengeService {
 
 		return challenge.getId();
 	}
-
 }
