@@ -174,4 +174,60 @@ class ChallengeTest {
 		assertThat(challenge.getStatus()).isEqualTo(RECRUITING);
 	}
 
+	/**
+	 * 연관 관계 메서드
+	 */
+	@Test
+	void association_method_challenge_tech_stacks() {
+		// given
+		ChallengeBuilder builder = getChallengeBuilder();
+		// when
+		Challenge challenge = builder.build();
+	    // then
+		ChallengeTechStack challengeTechStack = challenge.getChallengeTechStacks().get(0);
+		Challenge challengeFromTechStack = challengeTechStack.getChallenge();
+		assertThat(challengeFromTechStack).isEqualTo(challenge);
+	}
+
+
+	@Test
+	void association_method_challenge_quests() {
+		// given
+		ChallengeBuilder builder = getChallengeBuilder();
+		// when
+		Challenge challenge = builder.build();
+		// then
+		ChallengeQuest challengeQuest = challenge.getChallengeQuests().get(0);
+		Challenge challengeFromQuest = challengeQuest.getChallenge();
+		assertThat(challengeFromQuest).isEqualTo(challenge);
+	}
+
+	private ChallengeBuilder getChallengeBuilder() {
+		LocalDateTime startDate = LocalDateTime.now();
+		LocalDateTime endDate = startDate.plusDays(30);
+		Period period = new Period(startDate, endDate);
+
+		LocalDateTime recruitStartDate = LocalDateTime.now();
+		LocalDateTime recruitEndDate = recruitStartDate.plusDays(7);
+		Period recruitPeriod = new Period(recruitStartDate, recruitEndDate);
+		Recruit recruit = Recruit.builder()
+			.period(recruitPeriod)
+			.type(RecruitType.FIRST_COME_FIRST_SERVE)
+			.number(5)
+			.build();
+
+		List<ChallengeQuest> challengeQuests = List.of(new ChallengeQuest());
+		List<ChallengeTechStack> challengeTechStacks = List.of(new ChallengeTechStack());
+		List<String> funcRequirements = List.of("To-Do");
+
+		return Challenge.builder()
+			.challengeName("Challenge Ready")
+			.level(ChallengeLevel.BEGINNER)
+			.period(period)
+			.recruit(recruit)
+			.challengeQuests(challengeQuests)
+			.challengeTechStacks(challengeTechStacks)
+			.funcRequirements(funcRequirements);
+	}
+
 }

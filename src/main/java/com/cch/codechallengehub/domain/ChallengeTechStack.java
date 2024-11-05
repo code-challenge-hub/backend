@@ -1,5 +1,7 @@
 package com.cch.codechallengehub.domain;
 
+import static org.springframework.util.Assert.*;
+
 import com.cch.codechallengehub.entity.AuditingEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,5 +45,10 @@ public class ChallengeTechStack extends AuditingEntity {
 	@Builder
 	public ChallengeTechStack(String stackName) {
 		this.stackName = stackName;
+	}
+
+	public void associateChallenge(Challenge challenge) {
+		notNull(challenge, "Challenge is not null!");
+		this.challenge = challenge;
 	}
 }
