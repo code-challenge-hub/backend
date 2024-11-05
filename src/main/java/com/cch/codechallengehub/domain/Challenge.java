@@ -1,7 +1,8 @@
 package com.cch.codechallengehub.domain;
 
 
-import static com.cch.codechallengehub.constants.ChallengeStatus.*;
+import static com.cch.codechallengehub.constants.ChallengeStatus.READY;
+import static com.cch.codechallengehub.constants.ChallengeStatus.RECRUITING;
 import static org.springframework.util.Assert.notEmpty;
 import static org.springframework.util.Assert.notNull;
 
@@ -30,6 +31,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -79,6 +81,7 @@ public class Challenge extends AuditingEntity {
 	@Lob
 	private byte[] thumbnail;
 
+	@BatchSize(size = 100)
 	@OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ChallengeTechStack> challengeTechStacks = new ArrayList<>();
 
@@ -99,8 +102,13 @@ public class Challenge extends AuditingEntity {
 		this.challengeDesc = challengeDesc;
 		this.viewCount = viewCount;
 		this.thumbnail = thumbnail;
-		this.challengeQuests = challengeQuests;
+		challengeQuests.forEach(this::addChallengeQuest);
 		initStatus();
+	}
+
+	public void addChallengeQuest(ChallengeQuest challengeQuest) {
+		this.challengeQuests.add(challengeQuest);
+		challengeQuest.associateChallenge(this);
 	}
 
 	private void setChallengeName(String challengeName) {
@@ -132,6 +140,7 @@ public class Challenge extends AuditingEntity {
 		List<ChallengeTechStack> challengeTechStacks) {
 		notEmpty(challengeTechStacks, "Challenge tech stack is not null!");
 		this.challengeTechStacks = challengeTechStacks;
+		challengeTechStacks.forEach(challengeTechStack -> challengeTechStack.associateChallenge(this));
 	}
 
 	private void initStatus() {
