@@ -5,6 +5,7 @@ import static com.cch.codechallengehub.constants.ChallengeStatus.READY;
 import static com.cch.codechallengehub.constants.ChallengeStatus.RECRUITING;
 import static org.springframework.util.Assert.notEmpty;
 import static org.springframework.util.Assert.notNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import com.cch.codechallengehub.constants.ChallengeLevel;
 import com.cch.codechallengehub.constants.ChallengeStatus;
@@ -102,7 +103,9 @@ public class Challenge extends AuditingEntity {
 		this.challengeDesc = challengeDesc;
 		this.viewCount = viewCount;
 		this.thumbnail = thumbnail;
-		challengeQuests.forEach(this::addChallengeQuest);
+		if (!isEmpty(challengeQuests)) {
+			challengeQuests.forEach(this::addChallengeQuest);
+		}
 		initStatus();
 	}
 
