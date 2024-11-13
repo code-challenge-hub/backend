@@ -1,7 +1,9 @@
 package com.cch.codechallengehub.web.controller;
 
-import com.cch.codechallengehub.dto.UserDto;
+import com.cch.codechallengehub.dto.user.UserDto;
 import com.cch.codechallengehub.service.AuthService;
+import com.cch.codechallengehub.web.dto.user.UserCreateRequest;
+import com.cch.codechallengehub.web.mapper.user.UserCreateMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -19,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserCreateMapper userCreateMapper;
 
     @PostMapping("/v1/auth/join")
-    public ResponseEntity<Void> joinProcess(@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<Void> joinProcess(@RequestBody @Valid UserCreateRequest request) {
+        UserDto userDto = userCreateMapper.requestToDto(request);
         authService.joinProcess(userDto);
         return ResponseEntity.ok().build();
     }

@@ -1,17 +1,10 @@
 package com.cch.codechallengehub.domain;
 
+import com.cch.codechallengehub.constants.ParticipantsRole;
 import com.cch.codechallengehub.entity.AuditingEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,9 +34,17 @@ public class Participants extends AuditingEntity {
 	private User user;
 
 	@Column(name = "role")
-	private String role;
+	@Enumerated(EnumType.STRING)
+	private ParticipantsRole role;
 
 	@Column(name = "position")
 	private String position;
+
+	@Builder
+	public Participants(User user, ParticipantsRole role, String position) {
+		this.user = user;
+		this.role = role;
+		this.position = position;
+	}
 
 }

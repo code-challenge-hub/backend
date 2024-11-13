@@ -1,7 +1,7 @@
 package com.cch.codechallengehub.security.factory;
 
 import com.cch.codechallengehub.domain.User;
-import com.cch.codechallengehub.dto.CustomUserDetails;
+import com.cch.codechallengehub.dto.security.CustomUserDetails;
 import com.cch.codechallengehub.security.annotation.WithMockCustomUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

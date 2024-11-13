@@ -1,9 +1,15 @@
 package com.cch.codechallengehub.web.controller;
 
-import com.cch.codechallengehub.dto.PasswordDto;
-import com.cch.codechallengehub.dto.ProfileDto;
+import com.cch.codechallengehub.dto.user.PasswordDto;
+import com.cch.codechallengehub.dto.user.ProfileDto;
 import com.cch.codechallengehub.security.CommonSecurityTest;
 import com.cch.codechallengehub.service.UserService;
+import com.cch.codechallengehub.web.dto.user.PasswordModifyRequest;
+import com.cch.codechallengehub.web.dto.user.ProfileCreateRequest;
+import com.cch.codechallengehub.web.dto.user.ProfileResponse;
+import com.cch.codechallengehub.web.mapper.user.PasswordModifyMapper;
+import com.cch.codechallengehub.web.mapper.user.ProfileCreateMapper;
+import com.cch.codechallengehub.web.mapper.user.ProfileResponseMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +39,9 @@ class UserControllerTest extends CommonSecurityTest {
     @Autowired private MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
     @MockBean private UserService userService;
+    @MockBean private ProfileResponseMapper profileResponseMapper;
+    @MockBean private ProfileCreateMapper profileCreateMapper;
+    @MockBean private PasswordModifyMapper passwordModifyMapper;
 
     @Test
     @WithMockUser
@@ -44,8 +53,15 @@ class UserControllerTest extends CommonSecurityTest {
                                 .job("BE")
                                 .career(1)
                                 .build();
+        ProfileResponse response = ProfileResponse.builder()
+                .introduction("test")
+                .job("BE")
+                .career(1)
+                .build();
+
         when(userService.getProfile(anyString())).thenReturn(profileDto);
-        String requestJson = objectMapper.writeValueAsString(profileDto);
+        when(profileResponseMapper.profileDtoToResponse(any(ProfileDto.class))).thenReturn(response);
+        String requestJson = objectMapper.writeValueAsString(response);
 
         // when & then
         mockMvc.perform(get(BASE_URL +"/v1/user/profile"))
@@ -71,8 +87,10 @@ class UserControllerTest extends CommonSecurityTest {
     void setProfile_authenticatedUser_success() throws Exception {
         // given
         doNothing().when(userService).setProfile(anyString(), Mockito.any(ProfileDto.class));
+        ProfileCreateRequest request = ProfileCreateRequest.builder().job("test").build();
         ProfileDto profileDto = ProfileDto.builder().job("test").build();
-        String requestJson = objectMapper.writeValueAsString(profileDto);
+        when(profileCreateMapper.requestToDto(any(ProfileCreateRequest.class))).thenReturn(profileDto);
+        String requestJson = objectMapper.writeValueAsString(request);
 
         // when & then
         mockMvc.perform(post(BASE_URL + "/v1/user/profile")
@@ -102,8 +120,10 @@ class UserControllerTest extends CommonSecurityTest {
     void changePassword_authenticatedUser_success() throws Exception {
         // given
         doNothing().when(userService).changePassword(anyString(), Mockito.any(PasswordDto.class));
+        PasswordModifyRequest request = PasswordModifyRequest.builder().password("qwe123!").build();
         PasswordDto passwordDto = PasswordDto.builder().password("qwe123!").build();
-        String requestJson = objectMapper.writeValueAsString(passwordDto);
+        when(passwordModifyMapper.requestToDto(any(PasswordModifyRequest.class))).thenReturn(passwordDto);
+        String requestJson = objectMapper.writeValueAsString(request);
 
         // when & then
         mockMvc.perform(patch(BASE_URL +"/v1/user/password")

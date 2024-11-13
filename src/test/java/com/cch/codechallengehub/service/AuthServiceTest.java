@@ -2,11 +2,11 @@ package com.cch.codechallengehub.service;
 
 import com.cch.codechallengehub.config.AuditingConfig;
 import com.cch.codechallengehub.domain.User;
-import com.cch.codechallengehub.dto.UserDto;
+import com.cch.codechallengehub.dto.user.UserDto;
 import com.cch.codechallengehub.repository.UserRepository;
 import com.cch.codechallengehub.token.util.JWTUtil;
 import com.cch.codechallengehub.token.util.RefreshTokenUtil;
-import com.cch.codechallengehub.web.exception.BadRequestException;
+import com.cch.codechallengehub.web.exception.custom.BadRequestException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;

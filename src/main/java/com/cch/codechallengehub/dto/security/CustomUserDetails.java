@@ -1,4 +1,4 @@
-package com.cch.codechallengehub.dto;
+package com.cch.codechallengehub.dto.security;
 
 import com.cch.codechallengehub.domain.User;
 import org.springframework.security.core.GrantedAuthority;

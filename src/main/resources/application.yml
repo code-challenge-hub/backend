@@ -36,6 +36,13 @@ springdoc:
   swagger-ui:
     path: /swagger-ui
 
+# logging spring security
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+
 # jwt
 jwt:
   secret-key: ${JWT_SECRET_KEY}

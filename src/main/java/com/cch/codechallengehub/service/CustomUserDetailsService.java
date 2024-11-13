@@ -1,7 +1,7 @@
 package com.cch.codechallengehub.service;
 
 import com.cch.codechallengehub.domain.User;
-import com.cch.codechallengehub.dto.CustomUserDetails;
+import com.cch.codechallengehub.dto.security.CustomUserDetails;
 import com.cch.codechallengehub.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

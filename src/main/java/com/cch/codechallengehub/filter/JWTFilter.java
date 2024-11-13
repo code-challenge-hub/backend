@@ -2,7 +2,7 @@ package com.cch.codechallengehub.filter;
 
 import com.cch.codechallengehub.constants.AuthorizationType;
 import com.cch.codechallengehub.domain.User;
-import com.cch.codechallengehub.dto.CustomUserDetails;
+import com.cch.codechallengehub.dto.security.CustomUserDetails;
 import com.cch.codechallengehub.token.util.JWTUtil;
 import com.cch.codechallengehub.util.CommonUtil;
 import io.jsonwebtoken.ExpiredJwtException;
