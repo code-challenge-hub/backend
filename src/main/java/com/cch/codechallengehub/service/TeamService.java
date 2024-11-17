@@ -11,23 +11,25 @@ import com.cch.codechallengehub.repository.TeamRepository;
 import com.cch.codechallengehub.repository.UserRepository;
 import com.cch.codechallengehub.web.exception.custom.AccessDeniedException;
 import com.cch.codechallengehub.web.exception.custom.BadRequestException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly=true)
 public class TeamService {
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
     private final TeamRepository teamRepository;
 
+    @Transactional
     public Long createTeam(TeamCreateDto dto) {
 
-        //challeng id 검증
+        //challenge id 검증
         Challenge challenge = challengeRepository.findById(dto.getChallengeId())
                 .orElseThrow(() -> new BadRequestException("Challenge not found with id"));
 
@@ -79,7 +81,7 @@ public class TeamService {
     @Transactional
     public void updateTeamOverview(String username, TeamOverviewDto dto) {
         Team team = teamRepository.findById(dto.getTeamId())
-                .orElseThrow(() -> new BadRequestException("team not found with id"));;
+                .orElseThrow(() -> new BadRequestException("team not found with id"));
 
         //user가 admin 권한인지 확인
         boolean isAdmin = team.getParticipants().stream()
@@ -99,7 +101,7 @@ public class TeamService {
     @Transactional
     public void updateTeamStatus(String username, TeamStatusDto dto) {
         Team team = teamRepository.findById(dto.getTeamId())
-                .orElseThrow(() -> new BadRequestException("team not found with id"));;
+                .orElseThrow(() -> new BadRequestException("team not found with id"));
 
         //user가 admin 권한인지 확인
         boolean isAdmin = team.getParticipants().stream()

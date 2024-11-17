@@ -42,7 +42,7 @@ public class TeamController {
     }
 
     // 팀 소개 수정
-    @PostMapping("/v1/teams/{id}/overview")
+    @PatchMapping("/v1/teams/{id}/overview")
     public ResponseEntity<?> updateTeamOverview(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @RequestBody TeamUpdateRequest request) {
         TeamOverviewDto dto = TeamOverviewDto.builder().teamId(id).overview(request.getOverview()).build();
         teamService.updateTeamOverview(userDetails.getUsername(), dto);
@@ -50,7 +50,7 @@ public class TeamController {
     }
 
     // 팀 상태 수정
-    @PostMapping("/v1/teams/{id}/status")
+    @PatchMapping("/v1/teams/{id}/status")
     public ResponseEntity<?> updateTeamStatus(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id, @Valid @RequestBody TeamUpdateRequest request) {
         TeamStatusDto dto = TeamStatusDto.builder().teamId(id).status((TeamStatus) Enum.valueOf(TeamStatus.class, request.getStatus())).build();
         teamService.updateTeamStatus(userDetails.getUsername(), dto);

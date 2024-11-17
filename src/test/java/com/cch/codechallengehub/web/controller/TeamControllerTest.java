@@ -20,16 +20,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -129,7 +126,7 @@ class TeamControllerTest extends CommonSecurityTest {
         request.setOverview("Updated Overview");
 
         // when & then
-        mockMvc.perform(post(BASE_URL + "/v1/teams/{id}/overview", teamId)
+        mockMvc.perform(patch(BASE_URL + "/v1/teams/{id}/overview", teamId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -147,7 +144,7 @@ class TeamControllerTest extends CommonSecurityTest {
         request.setStatus("DONE");
 
         // when & then
-        mockMvc.perform(post(BASE_URL + "/v1/teams/{id}/status", teamId)
+        mockMvc.perform(patch(BASE_URL + "/v1/teams/{id}/status", teamId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -165,14 +162,14 @@ class TeamControllerTest extends CommonSecurityTest {
         request.setStatus("INVALID_STATUS");
 
         // when & then
-        MvcResult mvcResult = mockMvc.perform(post(BASE_URL + "/v1/teams/{id}/status", teamId)
+        MvcResult mvcResult = mockMvc.perform(patch(BASE_URL + "/v1/teams/{id}/status", teamId)
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(APPLICATION_JSON))
                         .andExpect(status().isBadRequest())
                         .andReturn();
 
         Exception resolvedException = mvcResult.getResolvedException();
-        assertTrue(resolvedException instanceof MethodArgumentNotValidException);
+        assertInstanceOf(MethodArgumentNotValidException.class, resolvedException);
 
         assertNotNull(resolvedException.getMessage());
         assertTrue(resolvedException.getMessage().contains("status is not valid"));
