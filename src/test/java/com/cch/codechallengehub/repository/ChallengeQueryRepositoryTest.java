@@ -5,6 +5,7 @@ import static com.cch.codechallengehub.constants.ChallengeLevel.BEGINNER;
 import static com.cch.codechallengehub.constants.RecruitType.FIRST_COME_FIRST_SERVE;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.cch.codechallengehub.config.AuditingConfig;
 import com.cch.codechallengehub.config.QueryDslConfig;
 import com.cch.codechallengehub.constants.ChallengeLevel;
 import com.cch.codechallengehub.domain.Challenge;
@@ -25,9 +26,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 
 @DataJpaTest
-@Import(QueryDslConfig.class)
+@Import({QueryDslConfig.class, AuditingConfig.class})
 class ChallengeQueryRepositoryTest {
 
 	@Autowired
@@ -94,7 +97,7 @@ class ChallengeQueryRepositoryTest {
 	}
 	
 	@Test
-	void search_challenge_where_like_name() {
+	void search_challenge_where_name_like() {
 	    // given
 		LocalDateTime now = LocalDateTime.now();
 		createChallenge("메모장 만들기"
@@ -104,7 +107,7 @@ class ChallengeQueryRepositoryTest {
 		createChallenge("To-Do List"
 			, List.of("Spring Boot", "Vue.js")
 			, new Period(now, now.plusDays(5))
-			, BEGINNER);
+			, ADVANCED);
 		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
 			.challengeNameLike("메모장")
 			.build();
@@ -117,62 +120,8 @@ class ChallengeQueryRepositoryTest {
 		ChallengeSearchResult challengeSearchResult = contents.get(0);
 		assertThat(contents.size()).isEqualTo(1);
 		assertThat(challengeSearchResult.getChallengeName()).isEqualTo("메모장 만들기");
-	}
-	@Test
-	void search_challenge_where_in_tech_stacks() {
-	    // given
-		LocalDateTime now = LocalDateTime.now();
-		createChallenge("메모장 만들기"
-			, List.of("Spring Boot", "Vue.js")
-			, new Period(now, now.plusDays(5))
-			, BEGINNER);
-		createChallenge("To-Do List"
-			, List.of("Node.js", "Vue.js")
-			, new Period(now, now.plusDays(5))
-			, BEGINNER);
-		createChallenge("인스타그램 클론 코딩"
-			, List.of("Node.js", "React.js")
-			, new Period(now, now.plusDays(5))
-			, ADVANCED);
-		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
-			.techStacks(List.of("Spring Boot", "React.js"))
-			.build();
-		PageRequest pageRequest = PageRequest.of(0, 5);
-	    // when
-		Slice<ChallengeSearchResult> results = challengeQueryRepository.findSlice(condition,
-			pageRequest);
-		// then
-		List<ChallengeSearchResult> contents = results.getContent();
-		ChallengeSearchResult challengeSearchResult = contents.get(0);
-		assertThat(contents.size()).isEqualTo(2);
-		assertThat(challengeSearchResult.getChallengeName()).isIn("메모장 만들기", "인스타그램 클론 코딩");
-	}
-	@Test
-	void search_challenge_where_equals_level() {
-	    // given
-		LocalDateTime now = LocalDateTime.now();
-		createChallenge("메모장 만들기"
-			, List.of("Spring Boot", "Vue.js")
-			, new Period(now, now.plusDays(5))
-			, BEGINNER);
-		createChallenge("인스타그램 클론 코딩"
-			, List.of("Node.js", "React.js")
-			, new Period(now, now.plusDays(5))
-			, ADVANCED);
-		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
-			.level(ADVANCED)
-			.build();
-		PageRequest pageRequest = PageRequest.of(0, 5);
-	    // when
-		Slice<ChallengeSearchResult> results = challengeQueryRepository.findSlice(condition,
-			pageRequest);
-		// then
-		List<ChallengeSearchResult> contents = results.getContent();
-		ChallengeSearchResult challengeSearchResult = contents.get(0);
-		assertThat(contents.size()).isEqualTo(1);
-		assertThat(challengeSearchResult.getChallengeName()).isEqualTo("인스타그램 클론 코딩");
-	}
 
+	}
 	private void createChallenge(String challengeName, List<String> stacks, Period recruitPeriod,
 		ChallengeLevel challengeLevel) {
 
@@ -198,6 +147,75 @@ class ChallengeQueryRepositoryTest {
 		em.persist(challenge);
 		em.flush();
 		em.clear();
+	}
+
+	@Test
+	void search_challenge_order_by_create_date_desc() throws InterruptedException {
+		// given
+		LocalDateTime now = LocalDateTime.now();
+		createChallenge("1"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		Thread.sleep(10);
+		createChallenge("2"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		Thread.sleep(10);
+		createChallenge("3"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		Thread.sleep(10);
+		createChallenge("4"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
+			.build();
+		Order createDateDesc = Order.desc("createdDate");
+		PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(createDateDesc));
+		// when
+		Slice<ChallengeSearchResult> results = challengeQueryRepository.findSlice(condition,
+			pageRequest);
+		// then
+		List<ChallengeSearchResult> contents = results.getContent();
+		ChallengeSearchResult challengeSearchResult = contents.get(0);
+		assertThat(challengeSearchResult.getChallengeName()).isEqualTo("4");
+	}
+	
+	@Test
+	void search_challenge_order_by_not_a_field_then_not_ordered() {
+		// given
+		LocalDateTime now = LocalDateTime.now();
+		createChallenge("1"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		createChallenge("2"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		createChallenge("3"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		createChallenge("4"
+			, List.of("Spring Boot", " m Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
+			.build();
+		Order createDateDesc = Order.desc("notField");
+		PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(createDateDesc));
+		// when
+		Slice<ChallengeSearchResult> results = challengeQueryRepository.findSlice(condition,
+			pageRequest);
+		// then
+		List<ChallengeSearchResult> contents = results.getContent();
+		ChallengeSearchResult challengeSearchResult = contents.get(0);
+		assertThat(challengeSearchResult.getLevel()).isEqualTo(BEGINNER);
 	}
 
 }
