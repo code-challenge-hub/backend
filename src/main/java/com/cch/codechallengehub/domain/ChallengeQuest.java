@@ -1,5 +1,7 @@
 package com.cch.codechallengehub.domain;
 
+import static io.jsonwebtoken.lang.Assert.notNull;
+
 import com.cch.codechallengehub.constants.QuestResultType;
 import com.cch.codechallengehub.entity.AuditingEntity;
 import jakarta.persistence.Column;
@@ -63,5 +65,10 @@ public class ChallengeQuest extends AuditingEntity {
 		this.questDetail = questDetail;
 		this.resultType = resultType;
 		this.orders = orders;
+	}
+
+	public void associateChallenge(Challenge challenge) {
+		notNull(challenge, "Challenge is not null!");
+		this.challenge = challenge;
 	}
 }
