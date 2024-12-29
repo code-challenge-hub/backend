@@ -74,6 +74,7 @@ class ChallengeQueryRepositoryTest {
 
 	private void createChallenge(int index) {
 		LocalDateTime now = LocalDateTime.now();
+
 		Recruit recruit = Recruit.builder()
 			.number(5)
 			.period(new Period(now, now.plusDays(1)))
@@ -82,7 +83,6 @@ class ChallengeQueryRepositoryTest {
 		ChallengeTechStack spring = ChallengeTechStack.builder()
 			.stackName("Spring " + index)
 			.build();
-
 		Challenge challenge = Challenge.builder()
 			.challengeName("1-1")
 			.level(BEGINNER)
@@ -150,7 +150,7 @@ class ChallengeQueryRepositoryTest {
 	}
 
 	@Test
-	void search_challenge_order_by_create_date_desc() throws InterruptedException {
+	void search_challenge_order_by_name_desc() throws InterruptedException {
 		// given
 		LocalDateTime now = LocalDateTime.now();
 		createChallenge("1"
@@ -174,7 +174,7 @@ class ChallengeQueryRepositoryTest {
 			, BEGINNER);
 		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
 			.build();
-		Order createDateDesc = Order.desc("createdDate");
+		Order createDateDesc = Order.desc("challengeName");
 		PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(createDateDesc));
 		// when
 		Slice<ChallengeSearchResult> results = challengeQueryRepository.findSlice(condition,
@@ -186,7 +186,7 @@ class ChallengeQueryRepositoryTest {
 	}
 	
 	@Test
-	void search_challenge_order_by_not_a_field_then_not_ordered() {
+	void search_challenge_order_by_default_created_date_desc() {
 		// given
 		LocalDateTime now = LocalDateTime.now();
 		createChallenge("1"
@@ -197,11 +197,11 @@ class ChallengeQueryRepositoryTest {
 			, List.of("Spring Boot", "Vue.js")
 			, new Period(now, now.plusDays(5))
 			, BEGINNER);
-		createChallenge("3"
+		createChallenge("4"
 			, List.of("Spring Boot", "Vue.js")
 			, new Period(now, now.plusDays(5))
 			, BEGINNER);
-		createChallenge("4"
+		createChallenge("3"
 			, List.of("Spring Boot", " m Vue.js")
 			, new Period(now, now.plusDays(5))
 			, BEGINNER);
@@ -215,7 +215,7 @@ class ChallengeQueryRepositoryTest {
 		// then
 		List<ChallengeSearchResult> contents = results.getContent();
 		ChallengeSearchResult challengeSearchResult = contents.get(0);
-		assertThat(challengeSearchResult.getLevel()).isEqualTo(BEGINNER);
+		assertThat(challengeSearchResult.getChallengeName()).isEqualTo("3");
 	}
 
 }
