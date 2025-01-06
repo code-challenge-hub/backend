@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChallengeSearchCondition {
 
-	private String challengeNameLike;
+	private String searchLike;
 	private List<String> techStacks;
 	private ChallengeStatus status;
 	private ChallengeLevel level;

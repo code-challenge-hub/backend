@@ -109,7 +109,7 @@ class ChallengeQueryRepositoryTest {
 			, new Period(now, now.plusDays(5))
 			, ADVANCED);
 		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
-			.challengeNameLike("메모장")
+			.searchLike("메모장")
 			.build();
 		PageRequest pageRequest = PageRequest.of(0, 5);
 	    // when
@@ -120,8 +120,34 @@ class ChallengeQueryRepositoryTest {
 		ChallengeSearchResult challengeSearchResult = contents.get(0);
 		assertThat(contents.size()).isEqualTo(1);
 		assertThat(challengeSearchResult.getChallengeName()).isEqualTo("메모장 만들기");
-
 	}
+
+	@Test
+	void search_challenge_where_tech_stack_like() {
+	    // given
+		LocalDateTime now = LocalDateTime.now();
+		createChallenge("메모장 만들기"
+			, List.of("Spring Boot", "Vue.js")
+			, new Period(now, now.plusDays(5))
+			, BEGINNER);
+		createChallenge("To-Do List"
+			, List.of("Spring Boot", "react.js")
+			, new Period(now, now.plusDays(5))
+			, ADVANCED);
+		ChallengeSearchCondition condition = ChallengeSearchCondition.builder()
+			.searchLike("react")
+			.build();
+		PageRequest pageRequest = PageRequest.of(0, 5);
+	    // when
+		Slice<ChallengeSearchResult> results = challengeQueryRepository.findSlice(condition,
+			pageRequest);
+		// then
+		List<ChallengeSearchResult> contents = results.getContent();
+		ChallengeSearchResult challengeSearchResult = contents.get(0);
+		assertThat(contents.size()).isEqualTo(1);
+		assertThat(challengeSearchResult.getChallengeName()).isEqualTo("To-Do List");
+	}
+
 	private void createChallenge(String challengeName, List<String> stacks, Period recruitPeriod,
 		ChallengeLevel challengeLevel) {
 
