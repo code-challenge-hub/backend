@@ -37,8 +37,7 @@ class SecurityCorsTest {
         mockMvc.perform(post("/api/v1/auth/join")
                 .content(body)
                 .contentType(APPLICATION_JSON)
-                .header("Origin", "http://localhost:5000")
-                .header("Access-Control-Request-Method", "GET"))
+                .header("Origin", "http://localhost:5000"))
             .andExpect(status().isOk())
             .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5000"))
             .andDo(print());
@@ -56,8 +55,7 @@ class SecurityCorsTest {
         mockMvc.perform(post("/api/v1/auth/join")
                 .content(body)
                 .contentType(APPLICATION_JSON)
-                .header("Origin", "http://test.com")
-                .header("Access-Control-Request-Method", "GET"))
+                .header("Origin", "http://test.com"))
             .andExpect(status().isForbidden())
             .andExpect(content().string("Invalid CORS request"))
             .andDo(print());
