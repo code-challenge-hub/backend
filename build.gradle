@@ -34,6 +34,8 @@ dependencies {
 	implementation platform('software.amazon.awssdk:bom:2.29.47')
 	implementation 'software.amazon.awssdk:sesv2'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	implementation platform('software.amazon.awssdk:bom:2.29.47')
+	implementation 'software.amazon.awssdk:sesv2'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
