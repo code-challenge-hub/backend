@@ -8,10 +8,13 @@ import com.cch.codechallengehub.repository.JoinEmailRepository;
 import com.cch.codechallengehub.repository.UserRepository;
 import com.cch.codechallengehub.web.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,9 @@ public class AuthEmailService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final JoinEmailRepository joinEmailRepository;
 
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String EMAIL_COUNT_KEY = "email:count:";
+
     @Transactional
     public void sendVerificationCodeEmail(String email) {
 
@@ -30,6 +36,10 @@ public class AuthEmailService {
 
         if (isExist) {
             throw new BadRequestException("This email already exists.");
+        }
+
+        if(getEmailCount() > 100){
+            throw new BadRequestException("This email count exceeds 100.");
         }
 
         //인증번호 생성
@@ -49,6 +59,7 @@ public class AuthEmailService {
                 .build();
 
         emailVerificationRepository.save(verification);
+        incrementEmailCount();
     }
 
     private String createCode() {
@@ -64,6 +75,33 @@ public class AuthEmailService {
             }
         }
         return key.toString();
+    }
+
+    private String getDailyEmailKey() {
+        String today = LocalDate.now().toString();
+        return EMAIL_COUNT_KEY + today;
+    }
+
+    private int getEmailCount() {
+        String key = getDailyEmailKey();
+        Object count = redisTemplate.opsForValue().get(key);
+        if (count instanceof Integer) {
+            return (Integer) count;
+        } else if (count instanceof String) {
+            try {
+                return Integer.parseInt((String) count);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    private void incrementEmailCount(){
+        String key = getDailyEmailKey();
+        redisTemplate.opsForValue().increment(key);
+        redisTemplate.expire(key, 1, TimeUnit.DAYS);
     }
 
     @Transactional

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -42,6 +43,8 @@ class AuthEmailServiceTest {
     EmailVerificationRepository emailVerificationRepository;
     @Autowired
     JoinEmailRepository joinEmailRepository;
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
 
     AuthEmailService authEmailService;
 
@@ -49,7 +52,7 @@ class AuthEmailServiceTest {
     void setUp() {
         sesService = new AwsSesService(client);
         ReflectionTestUtils.setField(sesService, "sendMailTo", "no-reply@codechallenge.kro.kr");
-        authEmailService = new AuthEmailService(sesService, userRepository, emailVerificationRepository, joinEmailRepository);
+        authEmailService = new AuthEmailService(sesService, userRepository, emailVerificationRepository, joinEmailRepository, redisTemplate);
     }
 
     @Test
