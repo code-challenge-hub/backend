@@ -12,7 +12,7 @@ spring:
     username: ${MYSQL_DATASOURCE_USER}
     password: ${MYSQL_DATASOURCE_PASSWORD}
 
-# redis 설정
+  # redis 설정
   data:
     redis:
       host: ${REDIS_HOST}
@@ -50,3 +50,11 @@ jwt:
   expiration-time: 60000
 
 apiPrefix: /api
+
+# AWS
+aws:
+  ses:
+    region: ${AWS_REGION}
+    access-key: ${AWS_SES_ACCESS_KEY}
+    secret-key: ${AWS_SES_SECRET_KEY}
+    send-mail-to: ${AWS_SES_ADMIN_EMAIL}
