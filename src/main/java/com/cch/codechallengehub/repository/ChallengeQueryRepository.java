@@ -61,6 +61,8 @@ public class ChallengeQueryRepository {
         List<ChallengeSearchResult> contents = challenges.stream()
             .map(challenge -> {
                 List<Team> teams = teamsMap.get(challenge.getId());
+                int participantsNum = teams == null ? 0 : teams.size();
+
                 List<ChallengeSearchTechStackResult> techStacks = techStacksMap.get(
                     challenge.getId());
                 return ChallengeSearchResult.builder()
@@ -75,7 +77,7 @@ public class ChallengeQueryRepository {
                     .thumbnail(challenge.getThumbnail())
                     .liked(false)
                     .likeCount(0)
-                    .participantsNum(teams == null ? 0 : teams.size())
+                    .participantsNum(participantsNum)
                     .recruitNum(challenge.getRecruit().getNumber())
                     .build();
             })
