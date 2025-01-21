@@ -6,6 +6,7 @@ import com.cch.codechallengehub.dto.auth.AuthEmailVerificationDto;
 import com.cch.codechallengehub.repository.EmailVerificationRepository;
 import com.cch.codechallengehub.repository.JoinEmailRepository;
 import com.cch.codechallengehub.repository.UserRepository;
+import com.cch.codechallengehub.util.RandomUtil;
 import com.cch.codechallengehub.web.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -47,7 +47,7 @@ public class AuthEmailService {
         }
 
         //인증번호 생성
-        String code = createCode();
+        String code = RandomUtil.getRandomStringWithLength(7);
         String mailSubject = "회원가입 인증번호";
         String mailBody = "<h2>요청하신 인증 번호입니다.</h2><h1>"+code+"</h1>";
 
@@ -64,21 +64,6 @@ public class AuthEmailService {
 
         emailVerificationRepository.save(verification);
         incrementEmailCount();
-    }
-
-    private String createCode() {
-        Random random = new Random();
-        StringBuilder key = new StringBuilder();
-
-        for (int i = 0; i < 7; i++) {
-            int index = random.nextInt(2);
-
-            switch (index) {
-                case 0 -> key.append((char) (random.nextInt(26) + 65));
-                case 1 -> key.append(random.nextInt(10));
-            }
-        }
-        return key.toString();
     }
 
     private String getDailyEmailKey() {
