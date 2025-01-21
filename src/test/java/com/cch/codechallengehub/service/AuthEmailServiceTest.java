@@ -53,6 +53,7 @@ class AuthEmailServiceTest {
         sesService = new AwsSesService(client);
         ReflectionTestUtils.setField(sesService, "sendMailTo", "no-reply@codechallenge.kro.kr");
         authEmailService = new AuthEmailService(sesService, userRepository, emailVerificationRepository, joinEmailRepository, redisTemplate);
+        ReflectionTestUtils.setField(authEmailService, "EMAIL_LIMIT", 100);
     }
 
     @Test

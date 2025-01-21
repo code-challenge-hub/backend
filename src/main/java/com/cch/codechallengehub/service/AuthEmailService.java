@@ -8,6 +8,7 @@ import com.cch.codechallengehub.repository.JoinEmailRepository;
 import com.cch.codechallengehub.repository.UserRepository;
 import com.cch.codechallengehub.web.exception.custom.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,9 @@ public class AuthEmailService {
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String EMAIL_COUNT_KEY = "email:count:";
 
+    @Value("${aws.ses.send-mail-limit:100}")
+    private int EMAIL_LIMIT;
+
     @Transactional
     public void sendVerificationCodeEmail(String email) {
 
@@ -38,8 +42,8 @@ public class AuthEmailService {
             throw new BadRequestException("This email already exists.");
         }
 
-        if(getEmailCount() > 100){
-            throw new BadRequestException("This email count exceeds 100.");
+        if(getEmailCount() > EMAIL_LIMIT){
+            throw new BadRequestException("This email count exceeds " + EMAIL_LIMIT);
         }
 
         //인증번호 생성

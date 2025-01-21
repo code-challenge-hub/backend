@@ -58,3 +58,4 @@ aws:
     access-key: ${AWS_SES_ACCESS_KEY}
     secret-key: ${AWS_SES_SECRET_KEY}
     send-mail-to: ${AWS_SES_ADMIN_EMAIL}
+    send-mail-limit : 100
