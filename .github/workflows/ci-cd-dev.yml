@@ -41,6 +41,7 @@ jobs:
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           fail_on_failure: true
+      # 아래 부터는 배포를 위한 과정
       # 환경 변수 쓰기
       - name: Create env file
         if: ${{ github.event.pull_request.merged == true }}
@@ -51,7 +52,10 @@ jobs:
           echo "MYSQL_DATASOURCE_PASSWORD=${{ secrets.MYSQL_DATASOURCE_PASSWORD }}" >> .env
           echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
           echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
-      # 아래 부터는 배포를 위한 과정
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_SES_ACCESS_KEY=${{ secrets.AWS_SES_ACCESS_KEY }}" >> .env
+          echo "AWS_SES_ADMIN_EMAIL=${{ secrets.AWS_SES_ADMIN_EMAIL }}" >> .env
+          echo "AWS_SES_SECRET_KEY=${{ secrets.AWS_SES_SECRET_KEY }}" >> .env
       # 파일 패키징
       - name: Zip application
         if: ${{ github.event.pull_request.merged == true }}
