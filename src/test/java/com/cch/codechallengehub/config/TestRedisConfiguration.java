@@ -4,6 +4,12 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.StringUtils;
 import redis.embedded.RedisServer;
 
@@ -81,5 +87,29 @@ public class TestRedisConfiguration {
         }
 
         throw new IllegalArgumentException("Not Found Available port: 10000 ~ 65535");
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", redisPort);
+        return new LettuceConnectionFactory(config);
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        // 일반적인 key:value의 경우 시리얼라이저
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        // Hash를 사용할 경우 시리얼라이저
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+
+        // 모든 경우
+        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
     }
 }

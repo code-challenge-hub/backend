@@ -1,0 +1,132 @@
+package com.cch.codechallengehub.service;
+
+import com.cch.codechallengehub.domain.EmailVerification;
+import com.cch.codechallengehub.domain.JoinEmail;
+import com.cch.codechallengehub.dto.auth.AuthEmailVerificationDto;
+import com.cch.codechallengehub.repository.EmailVerificationRepository;
+import com.cch.codechallengehub.repository.JoinEmailRepository;
+import com.cch.codechallengehub.repository.UserRepository;
+import com.cch.codechallengehub.util.RandomUtil;
+import com.cch.codechallengehub.web.exception.custom.BadRequestException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@RequiredArgsConstructor
+public class AuthEmailService {
+
+    private final AwsSesService sesService;
+    private final UserRepository userRepository;
+    private final EmailVerificationRepository emailVerificationRepository;
+    private final JoinEmailRepository joinEmailRepository;
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String EMAIL_COUNT_KEY = "email:count:";
+
+    @Value("${aws.ses.send-mail-limit:100}")
+    private int EMAIL_LIMIT;
+
+    @Transactional
+    public void sendVerificationCodeEmail(String email) {
+
+        // 이메일 가입 확인
+        Boolean isExist = userRepository.existsByEmail(email);
+
+        if (isExist) {
+            throw new BadRequestException("This email already exists.");
+        }
+
+        if(getEmailCount() > EMAIL_LIMIT){
+            throw new BadRequestException("This email count exceeds " + EMAIL_LIMIT);
+        }
+
+        //인증번호 생성
+        String code = RandomUtil.getRandomStringWithLength(7);
+        String mailSubject = "회원가입 인증번호";
+        String mailBody = "<h2>요청하신 인증 번호입니다.</h2><h1>"+code+"</h1>";
+
+        sesService.sendEmail(email, mailSubject, mailBody);
+
+        //redis에 인증번호 저장 (제한시간 15분)
+        EmailVerification verification = EmailVerification.builder()
+                .email(email)
+                .verificationCode(code)
+                .attemptCount(0)
+                .isDone(false)
+                .ttl(900L)
+                .build();
+
+        emailVerificationRepository.save(verification);
+        incrementEmailCount();
+    }
+
+    private String getDailyEmailKey() {
+        String today = LocalDate.now().toString();
+        return EMAIL_COUNT_KEY + today;
+    }
+
+    private int getEmailCount() {
+        String key = getDailyEmailKey();
+        Object count = redisTemplate.opsForValue().get(key);
+        if (count instanceof Integer) {
+            return (Integer) count;
+        } else if (count instanceof String) {
+            try {
+                return Integer.parseInt((String) count);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    private void incrementEmailCount(){
+        String key = getDailyEmailKey();
+        redisTemplate.opsForValue().increment(key);
+        redisTemplate.expire(key, 1, TimeUnit.DAYS);
+    }
+
+    @Transactional
+    public AuthEmailVerificationDto verificationCode(String email, String code) {
+        //이메일 존재 확인 => 이메일 인증 시간이 초과되었다.
+        EmailVerification verification = emailVerificationRepository.findById(email)
+                .orElseThrow(() -> new BadRequestException("이메일 인증 시간이 초과되었습니다."));
+
+        verification.plusAttemptCount();
+
+        //이미 인증이 롼료된 상태{
+        if (verification.isDone()) {
+            throw new BadRequestException("이미 인증이 완료된 상태입니다.");
+        }
+
+        //너무 많은시도
+        if (verification.getAttemptCount() > 5) {
+            throw new BadRequestException("너무 많은 시도를 하였습니다.");
+        }
+
+        //인증번호가 올바를때만 상태 변경
+        if (verification.getVerificationCode().equals(code)) {
+            verification.updateStatus(true);
+            //회원가입을 위해 인증완료했다는 정보를 따로 redis에 저장
+
+            joinEmailRepository.save(JoinEmail.builder().email(verification.getEmail()).build());
+        }
+
+        emailVerificationRepository.save(verification);
+
+        return AuthEmailVerificationDto.builder()
+                .email(verification.getEmail())
+                .verificationCode(code)
+                .attemptCount(verification.getAttemptCount())
+                .isDone(verification.isDone())
+                .build();
+
+    }
+}

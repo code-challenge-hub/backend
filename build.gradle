@@ -31,6 +31,8 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.6.0'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	implementation platform('software.amazon.awssdk:bom:2.29.47')
+	implementation 'software.amazon.awssdk:sesv2'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
