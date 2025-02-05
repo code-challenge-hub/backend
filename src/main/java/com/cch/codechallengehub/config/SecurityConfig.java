@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -46,28 +51,52 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment environment) throws Exception {
+
+        boolean isProdEnv = environment.acceptsProfiles(Profiles.of("prod"));
+        CorsConfigurationSource corsConfigurationSource = getCorsConfigurationSource(isProdEnv);
+
         String permitUrl = apiPrefix+"/v1/auth";
         http
-                .cors(cors -> cors.disable())
-                .csrf((auth) -> auth.disable())
-                .formLogin((auth) -> auth.disable())
-                .httpBasic((auth) -> auth.disable())
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .csrf((auth) -> auth.disable())
+            .formLogin((auth) -> auth.disable())
+            .httpBasic((auth) -> auth.disable())
+            .sessionManagement((session) -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/swagger-resources/**","/swagger-ui/**", "/swagger/**").permitAll()
-                        .requestMatchers(permitUrl+"/**").permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(new JWTFilter(jwtUtil,permitUrl), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/login"), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/logout"), LogoutFilter.class);
+            .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/swagger-resources/**","/swagger-ui/**", "/swagger/**").permitAll()
+                .requestMatchers(permitUrl+"/**").permitAll()
+                .anyRequest().authenticated())
+            .addFilterBefore(new JWTFilter(jwtUtil,permitUrl), LoginFilter.class)
+            .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/login"), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenUtil, apiPrefix+"/v1/auth/logout"), LogoutFilter.class);
         return http.build();
+    }
+
+    public CorsConfigurationSource getCorsConfigurationSource(boolean isProdEnv) {
+
+        CorsConfiguration configuration = getCorsConfiguration(isProdEnv);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    private CorsConfiguration getCorsConfiguration(boolean isProdEnv) {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // 운영 환경 임시
+        configuration.addAllowedOriginPattern(isProdEnv ? "*" : "http://localhost:*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
+        return configuration;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
