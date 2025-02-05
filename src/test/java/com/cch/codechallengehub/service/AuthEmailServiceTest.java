@@ -13,13 +13,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.sesv2.SesV2Client;
 
 import java.util.Optional;
 
@@ -29,12 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles("test")
 @DataJpaTest
 @EnableRedisRepositories(basePackages = "com.cch.codechallengehub.repository")
-@Import({TestRedisConfiguration.class, AuditingConfig.class, AwsConfig.class})
+@Import({TestRedisConfiguration.class, AuditingConfig.class})
 @Transactional
 class AuthEmailServiceTest {
 
-    @Autowired
-    SesV2Client client;
+    @MockBean
     AwsSesService sesService;
 
     @Autowired
@@ -50,8 +49,6 @@ class AuthEmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        sesService = new AwsSesService(client);
-        ReflectionTestUtils.setField(sesService, "sendMailTo", "no-reply@codechallenge.kro.kr");
         authEmailService = new AuthEmailService(sesService, userRepository, emailVerificationRepository, joinEmailRepository, redisTemplate);
         ReflectionTestUtils.setField(authEmailService, "EMAIL_LIMIT", 100);
     }
